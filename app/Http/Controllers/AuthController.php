@@ -22,7 +22,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard'); // ไปหน้าที่ต้องการ
+            return redirect()->intended('/rentals'); // ไปหน้าที่ต้องการ
         }
 
         return back()->withErrors([

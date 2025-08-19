@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DataTables - Samui Rent Car</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="public/css/datatables-custom.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <div class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex-1">
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                            <i class="fas fa-car text-red-600 mr-3"></i>
+                            ทดสอบ DataTables
+                        </h1>
+                        <p class="text-gray-600 text-lg">ทดสอบการทำงานของ DataTables กับ Tailwind CSS</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- DataTable Card -->
+                <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900">ตารางทดสอบ</h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="overflow-x-auto">
+                            <table id="testTable" class="w-full">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-200">
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ลำดับ</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">อีเมล</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <!-- DataTables จะเติมข้อมูลที่นี่ -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // ข้อมูลทดสอบ
+            var testData = [
+                {
+                    id: 1,
+                    name: 'สมชาย ใจดี',
+                    email: 'somchai@example.com',
+                    status: 'active'
+                },
+                {
+                    id: 2,
+                    name: 'สมหญิง รักดี',
+                    email: 'somying@example.com',
+                    status: 'inactive'
+                },
+                {
+                    id: 3,
+                    name: 'สมศักดิ์ มั่นคง',
+                    email: 'somsak@example.com',
+                    status: 'active'
+                },
+                {
+                    id: 4,
+                    name: 'สมศรี สวยงาม',
+                    email: 'somsri@example.com',
+                    status: 'pending'
+                },
+                {
+                    id: 5,
+                    name: 'สมชาย เก่งกล้า',
+                    email: 'somchai2@example.com',
+                    status: 'active'
+                }
+            ];
+
+            // กำหนดค่า DataTable
+            var table = $('#testTable').DataTable({
+                data: testData,
+                columns: [
+                    {
+                        data: 'id',
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        },
+                        orderable: false,
+                        searchable: false,
+                        width: '70px',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'name',
+                        width: '200px'
+                    },
+                    {
+                        data: 'email',
+                        width: '250px'
+                    },
+                    {
+                        data: 'status',
+                        render: function(data, type, row) {
+                            let statusText = '';
+                            let statusClass = '';
+                            switch (data) {
+                                case 'active':
+                                    statusText = 'ใช้งาน';
+                                    statusClass = 'bg-green-100 text-green-800';
+                                    break;
+                                case 'inactive':
+                                    statusText = 'ไม่ใช้งาน';
+                                    statusClass = 'bg-red-100 text-red-800';
+                                    break;
+                                case 'pending':
+                                    statusText = 'รอดำเนินการ';
+                                    statusClass = 'bg-yellow-100 text-yellow-800';
+                                    break;
+                                default:
+                                    statusText = 'ไม่ทราบสถานะ';
+                                    statusClass = 'bg-gray-100 text-gray-800';
+                            }
+                            return `<span class="px-2 py-1 text-xs font-medium rounded-full ${statusClass}">${statusText}</span>`;
+                        },
+                        width: '150px'
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="flex space-x-2">
+                                    <button class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors duration-200" 
+                                            title="แก้ไข" onclick="editItem(${row.id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200" 
+                                            title="ลบ" onclick="deleteItem(${row.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <button class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors duration-200" 
+                                            title="ดูรายละเอียด" onclick="viewItem(${row.id})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            `;
+                        },
+                        orderable: false,
+                        searchable: false,
+                        width: '150px'
+                    }
+                ],
+                order: [[0, 'asc']],
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]],
+                language: {
+                    "sProcessing": "กำลังประมวลผล...",
+                    "sLengthMenu": "แสดง _MENU_ รายการ",
+                    "sZeroRecords": "ไม่พบข้อมูล",
+                    "sEmptyTable": "ไม่มีข้อมูลในตาราง",
+                    "sInfo": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                    "sInfoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+                    "sInfoFiltered": "(กรองจาก _MAX_ รายการทั้งหมด)",
+                    "sInfoPostFix": "",
+                    "sSearch": "ค้นหา:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "กำลังโหลด...",
+                    "oPaginate": {
+                        "sFirst": "<i class='fas fa-angle-double-left'></i>",
+                        "sPrevious": "<i class='fas fa-angle-left'></i>",
+                        "sNext": "<i class='fas fa-angle-right'></i>",
+                        "sLast": "<i class='fas fa-angle-double-right'></i>"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": เปิดใช้งานการเรียงลำดับจากน้อยไปมาก",
+                        "sSortDescending": ": เปิดใช้งานการเรียงลำดับจากมากไปน้อย"
+                    }
+                },
+                responsive: true,
+                dom: '<"flex flex-col sm:flex-row justify-between items-center mb-4"<"flex-1"l><"flex-1"f>>' +
+                    '<"overflow-x-auto"tr>' +
+                    '<"flex flex-col sm:flex-row justify-between items-center mt-4"<"flex-1"i><"flex-1"p>>',
+            });
+
+            console.log('DataTable initialized successfully');
+        });
+
+        // Test functions
+        function editItem(id) {
+            console.log('Edit item:', id);
+            alert('แก้ไขรายการที่: ' + id);
+        }
+
+        function deleteItem(id) {
+            console.log('Delete item:', id);
+            if (confirm('คุณต้องการลบรายการที่ ' + id + ' หรือไม่?')) {
+                alert('ลบรายการที่: ' + id);
+            }
+        }
+
+        function viewItem(id) {
+            console.log('View item:', id);
+            alert('ดูรายละเอียดรายการที่: ' + id);
+        }
+    </script>
+</body>
+</html>
