@@ -9,9 +9,18 @@ use Yajra\DataTables\Facades\DataTables;
 use Mpdf\Mpdf;
 use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
+use App\Services\GoogleCalendarService;
+use Illuminate\Support\Facades\Log;
 
 class RentalController extends Controller
 {
+    protected $googleCalendarService;
+
+    public function __construct(GoogleCalendarService $googleCalendarService)
+    {
+        $this->googleCalendarService = $googleCalendarService;
+    }
+
     public function index()
     {
         if (request()->ajax()) {
@@ -145,7 +154,22 @@ class RentalController extends Controller
                 $data['driver_license_image'] = $request->file('driver_license_image')->store('rentals/driver_license', 'public');
             }
 
-            Rental::create($data);
+            $rental = Rental::create($data);
+
+            // Auto-sync ไปยัง Google Calendar
+            try {
+                $this->googleCalendarService->createRentalEvent($rental);
+                Log::info('Rental auto-synced to Google Calendar', [
+                    'rental_id' => $rental->id,
+                    'customer' => $rental->full_name
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to auto-sync rental to Google Calendar', [
+                    'rental_id' => $rental->id,
+                    'error' => $e->getMessage()
+                ]);
+                // ไม่ต้องหยุดการทำงาน แค่ log error
+            }
 
             return redirect()->route('rentals.create')->with('success', 'ข้อมูลการเช่ารถถูกบันทึกเรียบร้อยแล้ว');
 
@@ -260,7 +284,28 @@ class RentalController extends Controller
                 $data['driver_license_image'] = $request->file('driver_license_image')->store('rentals/driver_license', 'public');
             }
 
+            $oldStatus = $rental->status;
             $rental->update($data);
+
+            // Auto-sync ไปยัง Google Calendar เมื่อมีการเปลี่ยนแปลง
+            try {
+                if ($oldStatus !== $rental->status || $rental->google_calendar_event_id) {
+                    // อัปเดต event ใน Google Calendar
+                    $this->googleCalendarService->updateRentalEvent($rental);
+                    Log::info('Rental auto-updated in Google Calendar', [
+                        'rental_id' => $rental->id,
+                        'customer' => $rental->full_name,
+                        'old_status' => $oldStatus,
+                        'new_status' => $rental->status
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to auto-update rental in Google Calendar', [
+                    'rental_id' => $rental->id,
+                    'error' => $e->getMessage()
+                ]);
+                // ไม่ต้องหยุดการทำงาน แค่ log error
+            }
 
             return redirect()->route('rentals.index')->with('success', 'ข้อมูลการเช่ารถถูกอัปเดตเรียบร้อยแล้ว');
 
@@ -283,11 +328,44 @@ class RentalController extends Controller
                 Storage::disk('public')->delete($rental->driver_license_image);
             }
 
+            // ลบ event จาก Google Calendar ก่อน
+            try {
+                if ($rental->google_calendar_event_id) {
+                    $this->googleCalendarService->deleteRentalEvent($rental);
+                    Log::info('Rental auto-deleted from Google Calendar', [
+                        'rental_id' => $rental->id,
+                        'customer' => $rental->full_name
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to auto-delete rental from Google Calendar', [
+                    'rental_id' => $rental->id,
+                    'error' => $e->getMessage()
+                ]);
+                // ไม่ต้องหยุดการทำงาน แค่ log error
+            }
+
             $rental->delete();
+
+            // ตรวจสอบว่าเป็น AJAX request หรือไม่
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'ข้อมูลการเช่ารถถูกลบเรียบร้อยแล้ว'
+                ]);
+            }
 
             return redirect()->route('dashboard')->with('success', 'ข้อมูลการเช่ารถถูกลบเรียบร้อยแล้ว');
 
         } catch (\Exception $e) {
+            // ตรวจสอบว่าเป็น AJAX request หรือไม่
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'เกิดข้อผิดพลาดในการลบข้อมูล: ' . $e->getMessage()
+                ], 500);
+            }
+
             return redirect()->back()->with('error', 'เกิดข้อผิดพลาดในการลบข้อมูล: ' . $e->getMessage());
         }
     }

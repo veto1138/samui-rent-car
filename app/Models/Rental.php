@@ -35,11 +35,14 @@ class Rental extends Model
         'owner_lastname',
         'owner_witness_firstname',
         'owner_witness_lastname',
+        'google_calendar_event_id',
+        'calendar_synced_at',
     ];
 
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'calendar_synced_at' => 'datetime',
     ];
 
     // Accessor methods
@@ -304,5 +307,37 @@ class Rental extends Model
             })
             ->with('car')
             ->get();
+    }
+
+    // Google Calendar Accessors
+    public function getIsInGoogleCalendarAttribute()
+    {
+        return !empty($this->google_calendar_event_id);
+    }
+
+    public function getGoogleCalendarUrlAttribute()
+    {
+        if ($this->google_calendar_event_id) {
+            return "https://calendar.google.com/calendar/event?eid=" . $this->google_calendar_event_id;
+        }
+        return null;
+    }
+
+    public function getCalendarSyncStatusAttribute()
+    {
+        if ($this->is_in_google_calendar) {
+            return 'synced';
+        }
+        return 'not_synced';
+    }
+
+    public function getCalendarSyncStatusTextAttribute()
+    {
+        $statusMap = [
+            'synced' => 'เชื่อมต่อแล้ว',
+            'not_synced' => 'ยังไม่ได้เชื่อมต่อ'
+        ];
+        
+        return $statusMap[$this->calendar_sync_status] ?? 'ไม่ทราบสถานะ';
     }
 }

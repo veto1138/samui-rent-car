@@ -2,6 +2,7 @@
 
 @section('head')
     <title>รายการจองรถ</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{ asset('css/datatables-custom.css') }}" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 @endsection
@@ -14,7 +15,15 @@
                 <!-- DataTable Card -->
                 <div class="bg-white shadow-sm rounded-lg overflow-hidden">
                     <div class="p-4">
-                        <h2 class="text-lg font-semibold text-gray-900">รายการจองรถทั้งหมด</h2>
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-semibold text-gray-900">รายการจองรถทั้งหมด</h2>
+                            <div class="flex space-x-3">
+                                <a href="{{ route('google-calendar.index') }}"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
+                                    <i class="fas fa-calendar-alt mr-2"></i>จัดการ Google Calendar
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     <div class="p-4">
                         <div class="overflow-x-auto">
@@ -71,7 +80,8 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden" id="deleteModal">
+    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" id="deleteModal"
+        style="display: none;">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="mt-3">
                 <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
@@ -111,6 +121,17 @@
 
     <script>
         $(document).ready(function() {
+            console.log('Rentals page loaded');
+
+            // ตรวจสอบว่ามี delete button หรือไม่
+            setTimeout(function() {
+                var deleteButtons = $('.delete-btn');
+                console.log('Found delete buttons:', deleteButtons.length);
+                deleteButtons.each(function(index) {
+                    console.log('Delete button', index, 'data-id:', $(this).data('id'));
+                });
+            }, 1000);
+
             // กำหนดค่า DataTable
             var table = $('#rentalsTable').DataTable({
                 processing: true,
@@ -242,6 +263,27 @@
                     {
                         data: null,
                         render: function(data, type, row) {
+                            let calendarButton = '';
+                            if (row.google_calendar_event_id) {
+                                // ถ้ามีใน Google Calendar แล้ว
+                                calendarButton = `
+                                    <button onclick="viewInCalendar('${row.id}')" 
+                                            title="ดูใน Google Calendar" 
+                                            class="bg-green-500 w-11 h-11 hover:bg-green-600 text-white p-2 rounded-lg transition-colors duration-200">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </button>
+                                `;
+                            } else {
+                                // ถ้ายังไม่มีใน Google Calendar
+                                calendarButton = `
+                                    <button onclick="addToCalendar('${row.id}')" 
+                                            title="เพิ่มลง Google Calendar" 
+                                            class="bg-purple-500 w-11 h-11 hover:bg-purple-600 text-white p-2 rounded-lg transition-colors duration-200">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </button>
+                                `;
+                            }
+
                             return `
                              <div class="flex space-x-2">
                                  <a href="/rentals/${row.id}/edit" 
@@ -257,7 +299,8 @@
                                      <i class="fas fa-file-export"></i>
                                  </button>
                                  </a>
-                                 <button class="bg-red-500 w-11 h-11 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200" 
+                                 ${calendarButton}
+                                 <button class="bg-red-500 w-11 h-11 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200 delete-btn" 
                                          data-id="${row.id}" title="ลบ">
                                      <i class="fas fa-trash"></i>
                                  </button>
@@ -310,37 +353,67 @@
             // จัดการการลบข้อมูล
             $(document).on('click', '.delete-btn', function() {
                 var rentalId = $(this).data('id');
+                console.log('Delete button clicked for rental ID:', rentalId);
+
+                // เก็บ rental ID ไว้ใน global variable
+                window.currentDeleteRentalId = rentalId;
+
                 showDeleteModal();
+            });
 
-                $('#confirmDelete').off('click').on('click', function() {
-                    $.ajax({
-                        url: '/rentals/' + rentalId,
-                        type: 'DELETE',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            closeDeleteModal();
-                            table.ajax.reload();
+            // จัดการการยืนยันการลบ
+            $('#confirmDelete').on('click', function() {
+                var rentalId = window.currentDeleteRentalId;
+                console.log('Confirming delete for rental ID:', rentalId);
 
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'สำเร็จ!',
-                                text: 'ข้อมูลการจองรถถูกลบเรียบร้อยแล้ว',
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        },
-                        error: function(xhr) {
-                            closeDeleteModal();
+                if (!rentalId) {
+                    console.error('No rental ID found');
+                    return;
+                }
 
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'เกิดข้อผิดพลาด!',
-                                text: 'ไม่สามารถลบข้อมูลได้ กรุณาลองใหม่อีกครั้ง'
-                            });
-                        }
-                    });
+                // แสดง loading
+                $('#confirmDelete').prop('disabled', true).text('กำลังลบ...');
+
+                $.ajax({
+                    url: '/rentals/' + rentalId,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        console.log('Delete successful:', response);
+                        closeDeleteModal();
+                        table.ajax.reload();
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ!',
+                            text: 'ข้อมูลการจองรถถูกลบเรียบร้อยแล้ว',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Delete error:', xhr.responseText);
+                        closeDeleteModal();
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด!',
+                            text: 'ไม่สามารถลบข้อมูลได้: ' + (xhr.responseJSON
+                                ?.message || error),
+                            confirmButtonText: 'ตกลง'
+                        });
+                    },
+                    complete: function() {
+                        // Reset button
+                        $('#confirmDelete').prop('disabled', false).text('ลบข้อมูล');
+                    }
                 });
             });
 
@@ -363,11 +436,13 @@
 
         // Modal functions
         function showDeleteModal() {
-            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').style.display = 'block';
+            console.log('Delete modal shown');
         }
 
         function closeDeleteModal() {
-            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').style.display = 'none';
+            console.log('Delete modal hidden');
         }
 
         // Close modal when clicking outside
@@ -376,5 +451,78 @@
                 closeDeleteModal();
             }
         });
+
+        // Google Calendar Functions
+        function addToCalendar(rentalId) {
+            if (!confirm('คุณต้องการเพิ่มการเช่ารถนี้ลงใน Google Calendar หรือไม่?')) {
+                return;
+            }
+
+            // Show loading
+            $('body').append(
+                '<div id="loading" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50"><div class="bg-white p-4 rounded-lg"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div></div>'
+            );
+
+            $.ajax({
+                url: '/google-calendar/rentals/' + rentalId + '/add',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#loading').remove();
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        // Reload table
+                        table.ajax.reload();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด!',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    $('#loading').remove();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด!',
+                        text: 'ไม่สามารถเพิ่มข้อมูลลงใน Google Calendar ได้'
+                    });
+                }
+            });
+        }
+
+        function viewInCalendar(rentalId) {
+            $.ajax({
+                url: '/google-calendar/rentals/' + rentalId + '/view',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        window.open(response.calendar_url, '_blank');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด!',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด!',
+                        text: 'ไม่สามารถเปิด Google Calendar ได้'
+                    });
+                }
+            });
+        }
     </script>
 @endsection

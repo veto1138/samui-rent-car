@@ -5,6 +5,7 @@ use App\Http\Controllers\RentalController;
 use App\Http\Controllers\MPDFController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\GoogleCalendarController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -32,6 +33,21 @@ Route::middleware('auth')->group(function () {
     // Routes สำหรับตรวจสอบการเช่ารถซ้ำกัน
     Route::post('/rentals/check-available-cars', [RentalController::class, 'checkAvailableCars'])->name('rentals.check-available-cars');
     Route::post('/rentals/check-duplicate', [RentalController::class, 'checkDuplicateRentalAjax'])->name('rentals.check-duplicate');
+    
+    // Routes สำหรับ Google Calendar
+    Route::prefix('google-calendar')->group(function () {
+        Route::get('/', function() {
+            return view('google-calendar.index');
+        })->name('google-calendar.index');
+        Route::post('/rentals/{rental}/add', [GoogleCalendarController::class, 'addToCalendar'])->name('google-calendar.rentals.add');
+        Route::put('/rentals/{rental}/update', [GoogleCalendarController::class, 'updateInCalendar'])->name('google-calendar.rentals.update');
+        Route::delete('/rentals/{rental}/remove', [GoogleCalendarController::class, 'removeFromCalendar'])->name('google-calendar.rentals.remove');
+        Route::get('/rentals/{rental}/view', [GoogleCalendarController::class, 'viewInCalendar'])->name('google-calendar.rentals.view');
+        Route::get('/rentals/{rental}/test-url', [GoogleCalendarController::class, 'testEventUrl'])->name('google-calendar.rentals.test-url');
+        Route::post('/clear-invalid-events', [GoogleCalendarController::class, 'clearInvalidEventIds'])->name('google-calendar.clear-invalid-events');
+        Route::post('/test-connection', [GoogleCalendarController::class, 'testConnection'])->name('google-calendar.test-connection');
+        Route::post('/sync-all', [GoogleCalendarController::class, 'syncAllRentals'])->name('google-calendar.sync-all');
+    });
     
     // API Routes สำหรับ Dashboard
     Route::get('/api/statistics', function() {
