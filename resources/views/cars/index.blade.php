@@ -19,7 +19,7 @@
                                 <h2 class="text-2xl font-bold text-gray-900">รายการรถยนต์ทั้งหมด</h2>
                             </div>
                             <a href="{{ route('cars.create') }}"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
+                                class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
                                 <i class="fas fa-plus mr-2"></i>
                                 เพิ่มรถยนต์ใหม่
                             </a>

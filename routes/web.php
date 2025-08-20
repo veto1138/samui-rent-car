@@ -28,6 +28,51 @@ Route::middleware('auth')->group(function () {
     Route::get('/rentals/export', [RentalController::class, 'export'])->name('rentals.export');
     // Route::get('/rentals/export-pdf/{rental}', [RentalController::class, 'exportPdf'])->name('rentals.export-pdf');
     Route::get('/rentals/export-pdf-single/{rental}', [RentalController::class, 'exportPdfSingle'])->name('rentals.export-pdf-single');
+    
+    // Routes สำหรับตรวจสอบการเช่ารถซ้ำกัน
+    Route::post('/rentals/check-available-cars', [RentalController::class, 'checkAvailableCars'])->name('rentals.check-available-cars');
+    Route::post('/rentals/check-duplicate', [RentalController::class, 'checkDuplicateRentalAjax'])->name('rentals.check-duplicate');
+    
+    // API Routes สำหรับ Dashboard
+    Route::get('/api/statistics', function() {
+        $totalCars = \App\Models\Car::count();
+        $availableCars = \App\Models\Car::where('status', 'available')->count();
+        $rentedCars = \App\Models\Car::where('status', 'rented')->count();
+        $maintenanceCars = \App\Models\Car::where('status', 'maintenance')->count();
+        
+        return response()->json([
+            'total_cars' => $totalCars,
+            'available_cars' => $availableCars,
+            'rented_cars' => $rentedCars,
+            'maintenance_cars' => $maintenanceCars
+        ]);
+    })->name('api.statistics');
+    
+    Route::get('/api/current-rentals', function() {
+        $currentRentals = \App\Models\Rental::whereIn('status', ['pending', 'using'])
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orWhere(function($query) {
+                $query->where('start_date', '>=', now())
+                      ->where('status', 'pending');
+            })
+            ->orderBy('start_date', 'asc')
+            ->get();
+        
+        return response()->json([
+            'rentals' => $currentRentals
+        ]);
+    })->name('api.current-rentals');
+    
+    Route::get('/api/available-cars', function() {
+        $availableCars = \App\Models\Car::where('status', 'available')
+            ->orderBy('full_name', 'asc')
+            ->get();
+        
+        return response()->json([
+            'cars' => $availableCars
+        ]);
+    })->name('api.available-cars');
 });
 
 // Routes สำหรับจัดการรถยนต์

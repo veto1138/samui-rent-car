@@ -200,4 +200,109 @@ class Rental extends Model
         
         return $result . 'บาทถ้วน';
     }
+
+    // ตรวจสอบการเช่ารถซ้ำกันในวันเดียวกัน
+    public static function checkDuplicateRental($carId, $startDate, $endDate, $excludeId = null)
+    {
+        $query = self::where('car_id', $carId)
+            ->where('status', '!=', 'cancel') // ไม่รวมการเช่าที่ถูกยกเลิก
+            ->where(function ($q) use ($startDate, $endDate) {
+                // ตรวจสอบการทับซ้อนของช่วงเวลา
+                $q->where(function ($subQ) use ($startDate, $endDate) {
+                    // กรณีที่วันที่เริ่มใหม่อยู่ในช่วงวันที่เช่าเดิม
+                    $subQ->where('start_date', '<=', $startDate)
+                          ->where('end_date', '>', $startDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    // กรณีที่วันที่สิ้นสุดใหม่อยู่ในช่วงวันที่เช่าเดิม
+                    $subQ->where('start_date', '<', $endDate)
+                          ->where('end_date', '>=', $endDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    // กรณีที่ช่วงเวลาใหม่ครอบคลุมช่วงเวลาเดิม
+                    $subQ->where('start_date', '>=', $startDate)
+                          ->where('end_date', '<=', $endDate);
+                });
+            });
+
+        // ไม่รวมการเช่าปัจจุบันที่กำลังแก้ไข
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
+
+    // ตรวจสอบการเช่ารถซ้ำกันโดยใช้ทะเบียนรถ
+    public static function checkDuplicateRentalByLicensePlate($licensePlate, $startDate, $endDate, $excludeId = null)
+    {
+        $query = self::where('car_license_plate', $licensePlate)
+            ->where('status', '!=', 'cancel') // ไม่รวมการเช่าที่ถูกยกเลิก
+            ->where(function ($q) use ($startDate, $endDate) {
+                // ตรวจสอบการทับซ้อนของช่วงเวลา
+                $q->where(function ($subQ) use ($startDate, $endDate) {
+                    // กรณีที่วันที่เริ่มใหม่อยู่ในช่วงวันที่เช่าเดิม
+                    $subQ->where('start_date', '<=', $startDate)
+                          ->where('end_date', '>', $startDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    // กรณีที่วันที่สิ้นสุดใหม่อยู่ในช่วงวันที่เช่าเดิม
+                    $subQ->where('start_date', '<', $endDate)
+                          ->where('end_date', '>=', $endDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    // กรณีที่ช่วงเวลาใหม่ครอบคลุมช่วงเวลาเดิม
+                    $subQ->where('start_date', '>=', $startDate)
+                          ->where('end_date', '<=', $endDate);
+                });
+            });
+
+        // ไม่รวมการเช่าปัจจุบันที่กำลังแก้ไข
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
+
+    // ตรวจสอบรถที่พร้อมใช้งานในช่วงเวลาที่กำหนด
+    public static function getAvailableCars($startDate, $endDate)
+    {
+        $rentedCarIds = self::where('status', '!=', 'cancel')
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->where(function ($subQ) use ($startDate, $endDate) {
+                    $subQ->where('start_date', '<=', $startDate)
+                          ->where('end_date', '>', $startDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    $subQ->where('start_date', '<', $endDate)
+                          ->where('end_date', '>=', $endDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    $subQ->where('start_date', '>=', $startDate)
+                          ->where('end_date', '<=', $endDate);
+                });
+            })
+            ->pluck('car_id')
+            ->filter()
+            ->unique();
+
+        return \App\Models\Car::whereNotIn('id', $rentedCarIds)
+            ->where('status', 'available')
+            ->get();
+    }
+
+    // ตรวจสอบรถที่ถูกเช่าในช่วงเวลาที่กำหนด
+    public static function getRentedCars($startDate, $endDate)
+    {
+        return self::where('status', '!=', 'cancel')
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->where(function ($subQ) use ($startDate, $endDate) {
+                    $subQ->where('start_date', '<=', $startDate)
+                          ->where('end_date', '>', $startDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    $subQ->where('start_date', '<', $endDate)
+                          ->where('end_date', '>=', $endDate);
+                })->orWhere(function ($subQ) use ($startDate, $endDate) {
+                    $subQ->where('start_date', '>=', $startDate)
+                          ->where('end_date', '<=', $endDate);
+                });
+            })
+            ->with('car')
+            ->get();
+    }
 }

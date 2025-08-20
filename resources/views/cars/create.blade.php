@@ -116,14 +116,16 @@
                     </div>
 
                     <!-- Form Actions -->
-                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
+                    <div class="px-6 py-4  flex justify-end space-x-3">
                         <a href="{{ route('cars.index') }}"
                             class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             ยกเลิก
+                            <i class="fas fa-times ml-2"></i>
                         </a>
                         <button type="submit"
-                            class="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            class="px-4 py-2 bg-primary border border-transparent rounded-md text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             บันทึกข้อมูล
+                            <i class="fas fa-save ml-2"></i>
                         </button>
                     </div>
                 </form>

@@ -26,11 +26,6 @@
                                 <i class="fas fa-edit mr-2"></i>
                                 แก้ไข
                             </a>
-                            <a href="{{ route('cars.index') }}"
-                                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
-                                <i class="fas fa-arrow-left mr-2"></i>
-                                กลับ
-                            </a>
                         </div>
                     </div>
                 </div>

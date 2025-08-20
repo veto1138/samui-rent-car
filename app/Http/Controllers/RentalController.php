@@ -72,33 +72,62 @@ class RentalController extends Controller
 
     public function create()
     {
-        return view('rentals.create');
+        // ดึงรายการรถที่พร้อมใช้งาน
+        $availableCars = \App\Models\Car::where('status', 'available')->get();
+        return view('rentals.create', compact('availableCars'));
     }
 
     public function store(Request $request)
     {
         try {
-                    $request->validate([
-            'firstname' => 'required|string|max:100',
-            'lastname' => 'required|string|max:100',
-            'national_id' => 'required|string|regex:/^[1-8][0-9]{12}$/|size:13',
-            'phone' => 'required|string|regex:/^0[0-9]{9}$/|size:10',
-            'address' => 'required|string|max:100',
-            'witness_firstname' => 'required|string|max:100',
-            'witness_lastname' => 'required|string|max:100',
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'start_location' => 'required|string|max:150',
-            'end_location' => 'required|string|max:150',
-            'selfie_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'national_id_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'driver_license_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ], [
-            'national_id.regex' => 'เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลัก และหลักแรกต้องเป็น 1-8 เท่านั้น',
-            'national_id.size' => 'เลขบัตรประชาชนต้องมี 13 หลักเท่านั้น',
-            'phone.regex' => 'เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 0 และมี 10 หลักเท่านั้น',
-            'phone.size' => 'เบอร์โทรศัพท์ต้องมี 10 หลักเท่านั้น',
-        ]);
+            $request->validate([
+                'firstname' => 'required|string|max:100',
+                'lastname' => 'required|string|max:100',
+                'national_id' => 'required|string|regex:/^[1-8][0-9]{12}$/|size:13',
+                'phone' => 'required|string|regex:/^0[0-9]{9}$/|size:10',
+                'address' => 'required|string|max:100',
+                'witness_firstname' => 'required|string|max:100',
+                'witness_lastname' => 'required|string|max:100',
+                'start_date' => 'required|date|after_or_equal:today',
+                'end_date' => 'required|date|after_or_equal:start_date',
+                'start_location' => 'required|string|max:150',
+                'end_location' => 'required|string|max:150',
+                'selfie_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                'national_id_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                'driver_license_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'car_id' => 'nullable|exists:cars,id',
+                'car_license_plate' => 'nullable|string|max:20',
+            ], [
+                'national_id.regex' => 'เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลัก และหลักแรกต้องเป็น 1-8 เท่านั้น',
+                'national_id.size' => 'เลขบัตรประชาชนต้องมี 13 หลักเท่านั้น',
+                'phone.regex' => 'เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 0 และมี 10 หลักเท่านั้น',
+                'phone.size' => 'เบอร์โทรศัพท์ต้องมี 10 หลักเท่านั้น',
+            ]);
+
+            // ตรวจสอบการเช่ารถซ้ำกัน
+            if ($request->car_id) {
+                if (Rental::checkDuplicateRental(
+                    $request->car_id, 
+                    $request->start_date, 
+                    $request->end_date
+                )) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['car_id' => 'รถยนต์คันนี้ถูกเช่าในช่วงเวลาดังกล่าวแล้ว กรุณาเลือกรถคันอื่นหรือเปลี่ยนช่วงเวลา']);
+                }
+            }
+
+            if ($request->car_license_plate) {
+                if (Rental::checkDuplicateRentalByLicensePlate(
+                    $request->car_license_plate, 
+                    $request->start_date, 
+                    $request->end_date
+                )) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['car_license_plate' => 'รถยนต์ทะเบียนนี้ถูกเช่าในช่วงเวลาดังกล่าวแล้ว กรุณาเลือกรถคันอื่นหรือเปลี่ยนช่วงเวลา']);
+                }
+            }
 
             $data = $request->all();
             $data['status'] = 'pending';
@@ -132,7 +161,14 @@ class RentalController extends Controller
     public function edit(Rental $rental)
     {
         $cars = \App\Models\Car::all();
-        return view('rentals.edit', compact('rental', 'cars'));
+        
+        // ดึงรายการรถที่พร้อมใช้งานในช่วงเวลาที่เลือก
+        $availableCars = [];
+        if ($rental->start_date && $rental->end_date) {
+            $availableCars = Rental::getAvailableCars($rental->start_date, $rental->end_date);
+        }
+        
+        return view('rentals.edit', compact('rental', 'cars', 'availableCars'));
     }
 
     public function update(Request $request, Rental $rental)
@@ -148,8 +184,6 @@ class RentalController extends Controller
                 'witness_lastname' => 'required|string|max:100',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after_or_equal:start_date',
-                'start_location' => 'required|string|max:150',
-                'end_location' => 'required|string|max:150',
                 'status' => 'required|in:pending,using,success,cancel',
                 'car_id' => 'nullable|exists:cars,id',
                 'car_brand' => 'nullable|string|max:100',
@@ -171,6 +205,33 @@ class RentalController extends Controller
                 'phone.regex' => 'เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 0 และมี 10 หลักเท่านั้น',
                 'phone.size' => 'เบอร์โทรศัพท์ต้องมี 10 หลักเท่านั้น',
             ]);
+
+            // ตรวจสอบการเช่ารถซ้ำกัน (ไม่รวมการเช่าปัจจุบันที่กำลังแก้ไข)
+            if ($request->car_id) {
+                if (Rental::checkDuplicateRental(
+                    $request->car_id, 
+                    $request->start_date, 
+                    $request->end_date,
+                    $rental->id
+                )) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['car_id' => 'รถยนต์คันนี้ถูกเช่าในช่วงเวลาดังกล่าวแล้ว กรุณาเลือกรถคันอื่นหรือเปลี่ยนช่วงเวลา']);
+                }
+            }
+
+            if ($request->car_license_plate) {
+                if (Rental::checkDuplicateRentalByLicensePlate(
+                    $request->car_license_plate, 
+                    $request->start_date, 
+                    $request->end_date,
+                    $rental->id
+                )) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['car_license_plate' => 'รถยนต์ทะเบียนนี้ถูกเช่าในช่วงเวลาดังกล่าวแล้ว กรุณาเลือกรถคันอื่นหรือเปลี่ยนช่วงเวลา']);
+                }
+            }
 
             $data = $request->except(['selfie_image', 'national_id_image', 'driver_license_image']);
 
@@ -444,5 +505,75 @@ class RentalController extends Controller
         $filename = str_replace(' ', '-', $filename); // แทนที่ช่องว่างด้วย -
         
         return $mpdf->Output($filename, 'D');
+    }
+
+    // เพิ่ม method สำหรับตรวจสอบรถที่พร้อมใช้งานแบบ AJAX
+    public function checkAvailableCars(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        // ดึงรายการรถที่พร้อมใช้งาน
+        $availableCars = Rental::getAvailableCars($startDate, $endDate);
+        
+        // ดึงรายการรถที่ถูกเช่าในช่วงเวลาดังกล่าว
+        $rentedCars = Rental::getRentedCars($startDate, $endDate);
+
+        return response()->json([
+            'available_cars' => $availableCars,
+            'rented_cars' => $rentedCars,
+            'message' => 'พบรถที่พร้อมใช้งาน ' . $availableCars->count() . ' คัน'
+        ]);
+    }
+
+    // เพิ่ม method สำหรับตรวจสอบการซ้ำกันแบบ AJAX
+    public function checkDuplicateRentalAjax(Request $request)
+    {
+        $request->validate([
+            'car_id' => 'nullable|exists:cars,id',
+            'car_license_plate' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'rental_id' => 'nullable|exists:rentals,id', // สำหรับการแก้ไข
+        ]);
+
+        $isDuplicate = false;
+        $message = '';
+
+        if ($request->car_id) {
+            $isDuplicate = Rental::checkDuplicateRental(
+                $request->car_id,
+                $request->start_date,
+                $request->end_date,
+                $request->rental_id
+            );
+            
+            if ($isDuplicate) {
+                $message = 'รถยนต์คันนี้ถูกเช่าในช่วงเวลาดังกล่าวแล้ว';
+            }
+        }
+
+        if (!$isDuplicate && $request->car_license_plate) {
+            $isDuplicate = Rental::checkDuplicateRentalByLicensePlate(
+                $request->car_license_plate,
+                $request->start_date,
+                $request->end_date,
+                $request->rental_id
+            );
+            
+            if ($isDuplicate) {
+                $message = 'รถยนต์ทะเบียนนี้ถูกเช่าในช่วงเวลาดังกล่าวแล้ว';
+            }
+        }
+
+        return response()->json([
+            'is_duplicate' => $isDuplicate,
+            'message' => $message
+        ]);
     }
 }

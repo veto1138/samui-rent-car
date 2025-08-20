@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แบบฟอร์มการเช่ารถ</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Flatpickr CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -289,6 +291,12 @@
             const nationalIdInput = document.getElementById('national_id');
             const phoneInput = document.getElementById('phone');
             const form = document.querySelector('form');
+            const carIdSelect = document.getElementById('car_id');
+            const carLicensePlateInput = document.getElementById('car_license_plate');
+            const carFullNameInput = document.getElementById('car_full_name');
+            const checkAvailableCarsBtn = document.getElementById('checkAvailableCarsBtn');
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
 
             // แสดง SweetAlert2 เมื่อมี session success
             const successMessage = document.getElementById('success-message');
@@ -306,6 +314,51 @@
                         confirmButton: 'font-kanit'
                     }
                 });
+            }
+
+            // จัดการการเลือกรถยนต์
+            if (carIdSelect) {
+                carIdSelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    if (selectedOption.value) {
+                        carLicensePlateInput.value = selectedOption.dataset.license || '';
+                        carFullNameInput.value = selectedOption.dataset.name || '';
+
+                        // ตรวจสอบการซ้ำกัน
+                        checkDuplicateRental();
+                    } else {
+                        carLicensePlateInput.value = '';
+                        carFullNameInput.value = '';
+                        hideDuplicateWarning();
+                    }
+                });
+            }
+
+            // ตรวจสอบรถที่พร้อมใช้งาน
+            if (checkAvailableCarsBtn) {
+                checkAvailableCarsBtn.addEventListener('click', function() {
+                    const startDate = startDateInput.value;
+                    const endDate = endDateInput.value;
+
+                    if (!startDate || !endDate) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'คำเตือน!',
+                            text: 'กรุณาเลือกวันที่เริ่มและสิ้นสุดก่อน',
+                            confirmButtonText: 'ตกลง',
+                            confirmButtonColor: '#f59e0b'
+                        });
+                        return;
+                    }
+
+                    checkAvailableCars(startDate, endDate);
+                });
+            }
+
+            // ตรวจสอบการซ้ำกันเมื่อมีการเปลี่ยนแปลงวันที่
+            if (startDateInput && endDateInput) {
+                startDateInput.addEventListener('change', checkDuplicateRental);
+                endDateInput.addEventListener('change', checkDuplicateRental);
             }
 
             if (nationalIdInput) {
@@ -418,6 +471,169 @@
                 });
             }
         });
+
+        // ฟังก์ชันตรวจสอบรถที่พร้อมใช้งาน
+        function checkAvailableCars(startDate, endDate) {
+            const checkBtn = document.getElementById('checkAvailableCarsBtn');
+            const resultDiv = document.getElementById('availableCarsResult');
+            const carsListDiv = document.getElementById('availableCarsList');
+
+            // แสดง loading
+            checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>กำลังตรวจสอบ...';
+            checkBtn.disabled = true;
+
+            fetch('{{ route('rentals.check-available-cars') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        start_date: startDate,
+                        end_date: endDate
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // ซ่อน loading
+                    checkBtn.innerHTML = '<i class="fas fa-search mr-2"></i>ตรวจสอบ';
+                    checkBtn.disabled = false;
+
+                    // แสดงผลลัพธ์
+                    if (data.available_cars && data.available_cars.length > 0) {
+                        let carsHtml = '';
+                        data.available_cars.forEach(car => {
+                            carsHtml += `
+                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                                <div>
+                                    <span class="text-sm font-medium text-green-800">${car.full_name}</span>
+                                    <span class="text-xs text-green-600 ml-2">${car.license_plate}</span>
+                                </div>
+                                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">พร้อมใช้งาน</span>
+                            </div>
+                        `;
+                        });
+
+                        carsListDiv.innerHTML = carsHtml;
+                        resultDiv.classList.remove('hidden');
+
+                        // อัปเดต dropdown รถยนต์
+                        updateCarDropdown(data.available_cars);
+                    } else {
+                        carsListDiv.innerHTML = `
+                        <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <span class="text-sm text-yellow-800">ไม่พบรถที่พร้อมใช้งานในช่วงเวลาดังกล่าว</span>
+                        </div>
+                    `;
+                        resultDiv.classList.remove('hidden');
+                    }
+
+                    // แสดงข้อความสรุป
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'ผลการตรวจสอบ',
+                        text: data.message,
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    checkBtn.innerHTML = '<i class="fas fa-search mr-2"></i>ตรวจสอบ';
+                    checkBtn.disabled = false;
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด!',
+                        text: 'ไม่สามารถตรวจสอบรถที่พร้อมใช้งานได้ กรุณาลองใหม่อีกครั้ง',
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#ef4444'
+                    });
+                });
+        }
+
+        // ฟังก์ชันอัปเดต dropdown รถยนต์
+        function updateCarDropdown(availableCars) {
+            const carIdSelect = document.getElementById('car_id');
+            if (!carIdSelect) return;
+
+            // เก็บค่าที่เลือกไว้
+            const selectedValue = carIdSelect.value;
+
+            // ล้างตัวเลือกเดิม
+            carIdSelect.innerHTML = '<option value="">-- เลือกรถยนต์ --</option>';
+
+            // เพิ่มตัวเลือกใหม่
+            availableCars.forEach(car => {
+                const option = document.createElement('option');
+                option.value = car.id;
+                option.textContent = `${car.full_name} - ${car.license_plate}`;
+                option.dataset.license = car.license_plate;
+                option.dataset.brand = car.brand_name;
+                option.dataset.name = car.full_name;
+                carIdSelect.appendChild(option);
+            });
+
+            // เลือกค่าที่เลือกไว้เดิม (ถ้ายังมีอยู่)
+            if (selectedValue) {
+                carIdSelect.value = selectedValue;
+            }
+        }
+
+        // ฟังก์ชันตรวจสอบการซ้ำกัน
+        function checkDuplicateRental() {
+            const carId = document.getElementById('car_id').value;
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            if (!carId || !startDate || !endDate) {
+                hideDuplicateWarning();
+                return;
+            }
+
+            fetch('{{ route('rentals.check-duplicate') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        car_id: carId,
+                        start_date: startDate,
+                        end_date: endDate
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.is_duplicate) {
+                        showDuplicateWarning(data.message);
+                    } else {
+                        hideDuplicateWarning();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // ฟังก์ชันแสดงแจ้งเตือนการซ้ำกัน
+        function showDuplicateWarning(message) {
+            const warningDiv = document.getElementById('duplicateWarning');
+            const messageSpan = document.getElementById('duplicateMessage');
+
+            if (warningDiv && messageSpan) {
+                messageSpan.textContent = message;
+                warningDiv.classList.remove('hidden');
+            }
+        }
+
+        // ฟังก์ชันซ่อนแจ้งเตือนการซ้ำกัน
+        function hideDuplicateWarning() {
+            const warningDiv = document.getElementById('duplicateWarning');
+            if (warningDiv) {
+                warningDiv.classList.add('hidden');
+            }
+        }
     </script>
 </head>
 
@@ -664,10 +880,106 @@
                             @enderror
                         </div>
                     </div>
+
+                    <!-- ปุ่มตรวจสอบรถที่พร้อมใช้งาน -->
+                    <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-sm font-medium text-blue-800">ตรวจสอบรถที่พร้อมใช้งาน</h4>
+                                <p class="text-xs text-blue-600 mt-1">
+                                    คลิกปุ่มด้านล่างเพื่อดูรถที่พร้อมใช้งานในช่วงเวลาที่เลือก</p>
+                            </div>
+                            <button type="button" id="checkAvailableCarsBtn"
+                                class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                                <i class="fas fa-search mr-2"></i>ตรวจสอบ
+                            </button>
+                        </div>
+
+                        <!-- ผลการตรวจสอบ -->
+                        <div id="availableCarsResult" class="mt-4 hidden">
+                            <div class="border-t border-blue-200 pt-4">
+                                <h5 class="text-sm font-medium text-blue-800 mb-3">รถที่พร้อมใช้งาน:</h5>
+                                <div id="availableCarsList" class="space-y-2">
+                                    <!-- รายการรถจะถูกแสดงที่นี่ -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <p class="text-sm text-gray-500 mt-4">
                         <span class="text-red-500">*</span>
                         กรุณาเลือกวันที่ เวลา และสถานที่ที่ชัดเจน เพื่อความสะดวกในการจัดส่งรถ (เวลาเลือกได้ทีละ 10 นาที)
                     </p>
+                </div>
+            </div>
+
+            <!-- ข้อมูลรถยนต์ (เพิ่มใหม่) -->
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-primary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                        ข้อมูลรถยนต์
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="car_id" class="block text-sm font-medium text-gray-700">เลือกรถยนต์</label>
+                            <select id="car_id" name="car_id"
+                                class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                                <option value="">-- เลือกรถยนต์ --</option>
+                                @foreach ($availableCars as $car)
+                                    <option value="{{ $car->id }}" data-license="{{ $car->license_plate }}"
+                                        data-brand="{{ $car->brand_name }}" data-name="{{ $car->full_name }}">
+                                        {{ $car->full_name }} - {{ $car->license_plate }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('car_id')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="car_license_plate"
+                                class="block text-sm font-medium text-gray-700">ทะเบียนรถ</label>
+                            <input id="car_license_plate"
+                                class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                type="text" name="car_license_plate" value="{{ old('car_license_plate') }}"
+                                placeholder="ทะเบียนรถจะถูกเติมอัตโนมัติเมื่อเลือกรถ" readonly />
+                            @error('car_license_plate')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="md:col-span-2 space-y-2">
+                            <label for="car_full_name"
+                                class="block text-sm font-medium text-gray-700">ชื่อรถยนต์</label>
+                            <input id="car_full_name"
+                                class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                type="text" name="car_full_name" value="{{ old('car_full_name') }}"
+                                placeholder="ชื่อรถยนต์จะถูกเติมอัตโนมัติเมื่อเลือกรถ" readonly />
+                            @error('car_full_name')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- แจ้งเตือนการซ้ำกัน -->
+                    <div id="duplicateWarning" class="mt-4 p-4 bg-red-50 rounded-lg border border-red-200 hidden">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm text-red-800" id="duplicateMessage"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
