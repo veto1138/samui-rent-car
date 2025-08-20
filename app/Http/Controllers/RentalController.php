@@ -253,7 +253,6 @@ class RentalController extends Controller
         $defaultFontConfig = (new FontVariables())->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
-        // dd($rental);
         // ส่งข้อมูลการเช่าตาม ID ที่ส่งเข้ามา
 
         $name = $rental->full_name ?? ''; // สมมติว่ามีชื่อใน $user->name
@@ -380,6 +379,10 @@ class RentalController extends Controller
         $leftDotsInsurancePriceText  = intdiv($dotsInsurancePriceText, 2);
         $rightDotsInsurancePriceText = $dotsInsurancePriceText - $leftDotsInsurancePriceText;
 
+        $logoImage = public_path('images/logo.jpg');
+        $selfieImage = storage_path('app/public/' . str_replace('storage/', '', $rental->selfie_image));
+        $nationalIdImage = storage_path('app/public/' . str_replace('storage/', '', $rental->national_id_image));
+        $driverLicenseImage = storage_path('app/public/' . str_replace('storage/', '', $rental->driver_license_image));
 
         $data = [
             'rental' => $rental,
@@ -407,20 +410,11 @@ class RentalController extends Controller
             'rightDotsInsurancePrice' => $rightDotsInsurancePrice,
             'leftDotsInsurancePriceText' => $leftDotsInsurancePriceText,
             'rightDotsInsurancePriceText' => $rightDotsInsurancePriceText,
+            'selfieImage' => $selfieImage,
+            'nationalIdImage' => $nationalIdImage,
+            'driverLicenseImage' => $driverLicenseImage,
+            'logoImage' => $logoImage,
         ];
-
-        // ตรวจสอบข้อมูลและ accessor
-        // dd([
-        //     'rental_id' => $rental->id,
-        //     'start_date' => $rental->start_date,
-        //     'end_date' => $rental->end_date,
-        //     'start_time' => $rental->start_time,
-        //     'end_time' => $rental->end_time,
-        //     'thai_start_date' => $rental->thai_start_date,
-        //     'thai_end_date' => $rental->thai_end_date,
-        //     'formatted_start_date' => $rental->formatted_start_date,
-        //     'formatted_end_date' => $rental->formatted_end_date,
-        // ]);
         
         $html = view('pdf.old', $data)->render();
 
