@@ -81,9 +81,7 @@ class RentalController extends Controller
 
     public function create()
     {
-        // ดึงรายการรถที่พร้อมใช้งาน
-        $availableCars = \App\Models\Car::where('status', 'available')->get();
-        return view('rentals.create', compact('availableCars'));
+        return view('rentals.create');
     }
 
     public function store(Request $request)
