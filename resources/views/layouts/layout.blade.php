@@ -37,7 +37,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('rentals.index') }}">
+                        <a href="{{ route('users.index') }}">
                             <span>ผู้ใช้งาน</span>
                         </a>
                     </li>

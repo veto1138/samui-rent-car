@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\MPDFController;
+use App\Http\Controllers\UserController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -26,6 +27,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/rentals/export', [RentalController::class, 'export'])->name('rentals.export');
     // Route::get('/rentals/export-pdf/{rental}', [RentalController::class, 'exportPdf'])->name('rentals.export-pdf');
     Route::get('/rentals/export-pdf-single/{rental}', [RentalController::class, 'exportPdfSingle'])->name('rentals.export-pdf-single');
+});
+
+// Routes สำหรับจัดการผู้ใช้งาน
+Route::middleware('auth')->group(function () {
+    Route::resource('users', UserController::class);
 });
 
 // Routes สำหรับการทดสอบ PDF (ไม่ต้อง login)

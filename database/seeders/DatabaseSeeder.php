@@ -17,12 +17,15 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Test User',
+            'nickname' => 'Test',
+            'phone' => '080-000-0000',
             'email' => 'test@example.com',
         ]);
 
         // เพิ่มข้อมูลการเช่ารถตัวอย่าง
         $this->call([
             RentalSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

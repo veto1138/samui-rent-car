@@ -202,6 +202,8 @@ class MPDFController extends Controller
         $defaultFontConfig = (new FontVariables())->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
+        $rental = Rental::find(1);
+
         $data = [
             'title' => 'ทดสอบการสร้าง PDF ด้วยภาษาไทย',
             'content' => 'นี่คือตัวอย่างการสร้าง PDF ที่รองรับภาษาไทยใน Laravel โดยใช้ mPDF',
@@ -212,10 +214,11 @@ class MPDFController extends Controller
                 'รองรับการใส่รูปภาพ',
                 'สามารถกำหนดขนาดกระดาษได้'
             ],
-            'date' => now()->format('d/m/Y H:i')
+            'date' => now()->format('d/m/Y H:i'),
+            'rental' => $rental
         ];
         
-        $html = view('pdf.simple-template', $data)->render();
+        $html = view('pdf.old', $data)->render();
         
         // $mpdf = new Mpdf([
         //     'format' => 'A4',
@@ -231,10 +234,10 @@ class MPDFController extends Controller
             'fontDir' => array_merge($fontDirs, [storage_path('fonts')]),
             'fontdata' => $fontData + [
                 'thsarabun' => [
-                    'R'  => 'THSarabunNew.ttf',
-                    'B'  => 'THSarabunNew-Bold.ttf',
-                    'I'  => 'THSarabunNew-Italic.ttf',
-                    'BI' => 'THSarabunNew-BoldItalic.ttf',
+                    'R'  => 'THSarabun.ttf',
+                    'B'  => 'THSarabun Bold.ttf',
+                    'I'  => 'THSarabun Italic.ttf',
+                    'BI' => 'THSarabun Bold Italic.ttf',
                 ]
             ],
             'default_font' => 'thsarabun'

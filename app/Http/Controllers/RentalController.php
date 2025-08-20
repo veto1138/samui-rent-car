@@ -255,8 +255,158 @@ class RentalController extends Controller
 
         // dd($rental);
         // ส่งข้อมูลการเช่าตาม ID ที่ส่งเข้ามา
+
+        $name = $rental->full_name ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLength = 50; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $nameLength = mb_strlen($name, 'UTF-8');
+        $dots = $totalLength - $nameLength;
+        if ($dots < 0) $dots = 0;
+
+        $nationalId = $rental->national_id ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthNationalId = 50; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $nationalIdLength = mb_strlen($nationalId, 'UTF-8');
+        $dotsNationalId = $totalLengthNationalId - $nationalIdLength;
+        if ($dotsNationalId < 0) $dotsNationalId = 0;
+
+    
+        $leftDotsName  = intdiv($dots, 2);
+        $rightDotsName = $dots - $leftDotsName;
+
+        $leftDotsNationalId  = intdiv($dotsNationalId, 2);
+        $rightDotsNationalId = $dotsNationalId - $leftDotsNationalId;
+
+        $address = $rental->address ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthAddress = 110; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $addressLength = mb_strlen($address, 'UTF-8');
+        $dotsAddress = $totalLengthAddress - $addressLength;
+        if ($dotsAddress < 0) $dotsAddress = 0;
+
+        $leftDotsAddress  = intdiv($dotsAddress, 2);
+        $rightDotsAddress = $dotsAddress - $leftDotsAddress;
+
+        $phone = $rental->phone ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthPhone = 50; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $phoneLength = mb_strlen($phone, 'UTF-8');
+        $dotsPhone = $totalLengthPhone - $phoneLength;
+        if ($dotsPhone < 0) $dotsPhone = 0;
+
+        $leftDotsPhone  = intdiv($dotsPhone, 2);
+        $rightDotsPhone = $dotsPhone - $leftDotsPhone;
+
+        $carBrand = $rental->car_brand ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthCarBrand = 30; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $carBrandLength = mb_strlen($carBrand, 'UTF-8');
+        $dotsCarBrand = $totalLengthCarBrand - $carBrandLength;
+        if ($dotsCarBrand < 0) $dotsCarBrand = 0;
+
+        $leftDotsCarBrand  = intdiv($dotsCarBrand, 2);
+        $rightDotsCarBrand = $dotsCarBrand - $leftDotsCarBrand;
+
+        $carLicensePlate = $rental->car_license_plate ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthCarLicensePlate = 36; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $carLicensePlateLength = mb_strlen($carLicensePlate, 'UTF-8');
+        $dotsCarLicensePlate = $totalLengthCarLicensePlate - $carLicensePlateLength;
+        if ($dotsCarLicensePlate < 0) $dotsCarLicensePlate = 0;
+
+        $leftDotsCarLicensePlate  = intdiv($dotsCarLicensePlate, 2);
+        $rightDotsCarLicensePlate = $dotsCarLicensePlate - $leftDotsCarLicensePlate;
+
+        $rentPrice = $rental->rent_price ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthRentPrice = 50; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $rentPriceLength = mb_strlen($rentPrice, 'UTF-8');
+        $dotsRentPrice = $totalLengthRentPrice - $rentPriceLength;
+        if ($dotsRentPrice < 0) $dotsRentPrice = 0;
+        
+        $leftDotsRentPrice  = intdiv($dotsRentPrice, 2);
+        $rightDotsRentPrice = $dotsRentPrice - $leftDotsRentPrice;
+
+        $rentPriceText = $rental->rent_price_text ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthRentPriceText = 50; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $rentPriceTextLength = mb_strlen($rentPriceText, 'UTF-8');
+        $dotsRentPriceText = $totalLengthRentPriceText - $rentPriceTextLength;
+        if ($dotsRentPriceText < 0) $dotsRentPriceText = 0;
+        
+        $leftDotsRentPriceText  = intdiv($dotsRentPriceText, 2);
+        $rightDotsRentPriceText = $dotsRentPriceText - $leftDotsRentPriceText;
+
+        $startDate = $rental->start_date ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthStartDate = 60; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $startDateLength = mb_strlen($startDate, 'UTF-8');
+        $dotsStartDate = $totalLengthStartDate - $startDateLength;
+        if ($dotsStartDate < 0) $dotsStartDate = 0;
+        
+        $leftDotsStartDate  = intdiv($dotsStartDate, 2);
+        $rightDotsStartDate = $dotsStartDate - $leftDotsStartDate;
+
+        $endDate = $rental->end_date ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthEndDate = 50; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $endDateLength = mb_strlen($endDate, 'UTF-8');
+        $dotsEndDate = $totalLengthEndDate - $endDateLength;
+        if ($dotsEndDate < 0) $dotsEndDate = 0;
+        
+        $leftDotsEndDate  = intdiv($dotsEndDate, 2);
+        $rightDotsEndDate = $dotsEndDate - $leftDotsEndDate;
+
+
+        // insurancePrice
+        $insurancePrice = $rental->insurance_price ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthInsurancePrice = 14; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $insurancePriceLength = mb_strlen($insurancePrice, 'UTF-8');
+        $dotsInsurancePrice = $totalLengthInsurancePrice - $insurancePriceLength;
+        if ($dotsInsurancePrice < 0) $dotsInsurancePrice = 0;
+
+        $leftDotsInsurancePrice  = intdiv($dotsInsurancePrice, 2);
+        $rightDotsInsurancePrice = $dotsInsurancePrice - $leftDotsInsurancePrice;
+
+        // insurancePriceText
+        $insurancePriceText = $rental->insurance_price_text ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthInsurancePriceText = 34; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+    
+        $insurancePriceTextLength = mb_strlen($insurancePriceText, 'UTF-8');
+        $dotsInsurancePriceText = $totalLengthInsurancePriceText - $insurancePriceTextLength;
+        if ($dotsInsurancePriceText < 0) $dotsInsurancePriceText = 0;
+
+        $leftDotsInsurancePriceText  = intdiv($dotsInsurancePriceText, 2);
+        $rightDotsInsurancePriceText = $dotsInsurancePriceText - $leftDotsInsurancePriceText;
+
+
         $data = [
-            'rental' => $rental
+            'rental' => $rental,
+            'leftDotsName' => $leftDotsName,
+            'rightDotsName' => $rightDotsName,
+            'leftDotsNationalId' => $leftDotsNationalId,
+            'rightDotsNationalId' => $rightDotsNationalId,
+            'leftDotsAddress' => $leftDotsAddress,
+            'rightDotsAddress' => $rightDotsAddress,
+            'leftDotsPhone' => $leftDotsPhone,
+            'rightDotsPhone' => $rightDotsPhone,
+            'leftDotsCarBrand' => $leftDotsCarBrand,
+            'rightDotsCarBrand' => $rightDotsCarBrand,
+            'leftDotsCarLicensePlate' => $leftDotsCarLicensePlate,
+            'rightDotsCarLicensePlate' => $rightDotsCarLicensePlate,
+            'leftDotsRentPrice' => $leftDotsRentPrice,
+            'rightDotsRentPrice' => $rightDotsRentPrice,
+            'leftDotsRentPriceText' => $leftDotsRentPriceText,
+            'rightDotsRentPriceText' => $rightDotsRentPriceText,
+            'leftDotsStartDate' => $leftDotsStartDate,
+            'rightDotsStartDate' => $rightDotsStartDate,
+            'leftDotsEndDate' => $leftDotsEndDate,
+            'rightDotsEndDate' => $rightDotsEndDate,
+            'leftDotsInsurancePrice' => $leftDotsInsurancePrice,
+            'rightDotsInsurancePrice' => $rightDotsInsurancePrice,
+            'leftDotsInsurancePriceText' => $leftDotsInsurancePriceText,
+            'rightDotsInsurancePriceText' => $rightDotsInsurancePriceText,
         ];
 
         // ตรวจสอบข้อมูลและ accessor
@@ -272,16 +422,16 @@ class RentalController extends Controller
         //     'formatted_end_date' => $rental->formatted_end_date,
         // ]);
         
-        $html = view('pdf.rental-report', $data)->render();
+        $html = view('pdf.old', $data)->render();
 
         $mpdf = new Mpdf([
             'fontDir' => array_merge($fontDirs, [storage_path('fonts')]),
             'fontdata' => $fontData + [
                 'thsarabun' => [
-                    'R'  => 'THSarabunNew.ttf',
-                    'B'  => 'THSarabunNew-Bold.ttf',
-                    'I'  => 'THSarabunNew-Italic.ttf',
-                    'BI' => 'THSarabunNew-BoldItalic.ttf',
+                    'R'  => 'THSarabun.ttf',
+                    'B'  => 'THSarabun Bold.ttf',
+                    'I'  => 'THSarabun Italic.ttf',
+                    'BI' => 'THSarabun Bold Italic.ttf',
                 ]
             ],
             'default_font' => 'thsarabun'

@@ -415,9 +415,21 @@
                                     <label for="write_address" class="block text-sm font-medium text-gray-700 mb-2">
                                         เขียนที่
                                     </label>
-                                    <input type="text" name="write_address" id="write_address"
+                                    {{-- <input type="text" name="write_address" id="write_address"
                                         value="{{ old('write_address', $rental->write_address) }}"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"> --}}
+                                    <select name="write_address" id="write_address" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                                        <option value="">เขียนที่</option>
+                                        <option value="154/2 หมู่ 2 ตำบลแม่น้ำ อำเภอเกาะสมุย จังหวัดสุราษฎร์ธานี 84330"
+                                            {{ old('write_address', $rental->write_address) == '154/2 หมู่ 2 ตำบลแม่น้ำ อำเภอเกาะสมุย จังหวัดสุราษฎร์ธานี 84330' ? 'selected' : '' }}>
+                                            154/2 หมู่ 2 ตำบลแม่น้ำ อำเภอเกาะสมุย จังหวัดสุราษฎร์ธานี 84330
+                                        </option>
+                                        <option value="70 หมู่ 2 ตำบลท่าฉาง อำเภอท่าฉาง จังหวัดสุราษฎร์ธานี 84150"
+                                            {{ old('write_address', $rental->write_address) == '70 หมู่ 2 ตำบลท่าฉาง อำเภอท่าฉาง จังหวัดสุราษฎร์ธานี 84150' ? 'selected' : '' }}>
+                                            70 หมู่ 2 ตำบลท่าฉาง อำเภอท่าฉาง จังหวัดสุราษฎร์ธานี 84150
+                                        </option>
+                                    </select>
                                     @error('write_address')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
