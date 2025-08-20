@@ -29,8 +29,10 @@ return new class extends Migration
             $table->string('selfie_image', 255)->nullable(); //รูปถ่ายตัวเอง
             $table->string('national_id_image', 255)->nullable(); //รูปถ่ายบัตรประชาชน
             $table->string('driver_license_image', 255)->nullable(); //รูปถ่ายใบขับขี่
+            $table->unsignedBigInteger('car_id')->nullable(); //ID รถยนต์
             $table->string('car_brand', 100)->nullable(); //ยี่ห้อรถ
             $table->string('car_license_plate', 20)->nullable(); //ทะเบียนรถ
+            $table->string('car_full_name', 100)->nullable(); //ชื่อรถยนต์
             $table->enum('status', ['pending', 'using', 'success', 'cancel'])->default('pending'); //สถานะ
             $table->text('write_address',255)->nullable(); //เขียนที่
             $table->string('owner_firstname', 100)->nullable(); //ชื่อเจ้าของรถ

@@ -131,7 +131,8 @@ class RentalController extends Controller
 
     public function edit(Rental $rental)
     {
-        return view('rentals.edit', compact('rental'));
+        $cars = \App\Models\Car::all();
+        return view('rentals.edit', compact('rental', 'cars'));
     }
 
     public function update(Request $request, Rental $rental)
@@ -150,8 +151,10 @@ class RentalController extends Controller
                 'start_location' => 'required|string|max:150',
                 'end_location' => 'required|string|max:150',
                 'status' => 'required|in:pending,using,success,cancel',
+                'car_id' => 'nullable|exists:cars,id',
                 'car_brand' => 'nullable|string|max:100',
                 'car_license_plate' => 'nullable|string|max:20',
+                'car_full_name' => 'nullable|string|max:100',
                 'rent_price' => 'nullable|numeric|min:0',
                 'insurance_price' => 'nullable|numeric|min:0',
                 'owner_firstname' => 'nullable|string|max:100',
@@ -255,6 +258,8 @@ class RentalController extends Controller
 
         // ส่งข้อมูลการเช่าตาม ID ที่ส่งเข้ามา
 
+        // dd($rental);
+
         $name = $rental->full_name ?? ''; // สมมติว่ามีชื่อใน $user->name
         $totalLength = 50; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
     
@@ -296,7 +301,7 @@ class RentalController extends Controller
         $leftDotsPhone  = intdiv($dotsPhone, 2);
         $rightDotsPhone = $dotsPhone - $leftDotsPhone;
 
-        $carBrand = $rental->car_brand ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $carBrand = $rental->car_full_name ?? ''; // สมมติว่ามีชื่อใน $user->name
         $totalLengthCarBrand = 30; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
     
         $carBrandLength = mb_strlen($carBrand, 'UTF-8');

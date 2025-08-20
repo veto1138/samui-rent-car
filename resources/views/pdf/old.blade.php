@@ -91,7 +91,7 @@
     </p>
     <p class="m-0" style="text-indent: 70px;margin-top: 16px;">
         <strong>ข้อ 1.</strong> ผู้เช่าได้เช่ารถยนต์ยี่ห้อ {{ str_repeat('.', $leftDotsCarBrand) }}
-        {{ $rental->car_brand }}
+        {{ $rental->car_full_name }}
         {{ str_repeat('.', $rightDotsCarBrand) }}
         เลขทะเบียน
         {{ str_repeat('.', $leftDotsCarLicensePlate) }} {{ $rental->car_license_plate }}

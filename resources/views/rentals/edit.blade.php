@@ -197,30 +197,63 @@
                         <div class="pb-6">
                             <h3 class="text-lg font-medium text-gray-900 mb-4">ข้อมูลรถ</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Car Brand -->
+                                <!-- Car Selection -->
+                                <div>
+                                    <label for="car_id" class="block text-sm font-medium text-gray-700 mb-2">
+                                        เลือกรถยนต์
+                                    </label>
+                                    <select name="car_id" id="car_id"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                                        onchange="updateCarInfo()">
+                                        <option value="">-- เลือกรถยนต์ --</option>
+                                        @foreach ($cars as $car)
+                                            <option value="{{ $car->id }}" data-brand="{{ $car->brand_name }}"
+                                                data-license="{{ $car->license_plate }}"
+                                                data-full-name="{{ $car->full_name }}"
+                                                {{ old('car_id', $rental->car_id) == $car->id ? 'selected' : '' }}>
+                                                {{ $car->full_name }} - {{ $car->license_plate }} ({{ $car->status }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('car_id')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Car Brand (Auto-filled) -->
                                 <div>
                                     <label for="car_brand" class="block text-sm font-medium text-gray-700 mb-2">
                                         ยี่ห้อรถ
                                     </label>
                                     <input type="text" name="car_brand" id="car_brand"
-                                        value="{{ old('car_brand', $rental->car_brand) }}"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                                        value="{{ old('car_brand', $rental->car_brand) }}" readonly
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-primary focus:border-primary">
                                     @error('car_brand')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
-                                <!-- Car License Plate -->
+                                <!-- Car License Plate (Auto-filled) -->
                                 <div>
                                     <label for="car_license_plate" class="block text-sm font-medium text-gray-700 mb-2">
                                         ทะเบียนรถ
                                     </label>
                                     <input type="text" name="car_license_plate" id="car_license_plate"
-                                        value="{{ old('car_license_plate', $rental->car_license_plate) }}"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                                        value="{{ old('car_license_plate', $rental->car_license_plate) }}" readonly
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-primary focus:border-primary">
                                     @error('car_license_plate')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
+                                </div>
+
+                                <!-- Car Full Name (Auto-filled) -->
+                                <div>
+                                    <label for="car_full_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                        ชื่อรถยนต์
+                                    </label>
+                                    <input type="text" name="car_full_name" id="car_full_name"
+                                        value="{{ old('car_full_name', $rental->car_full_name ?? '') }}" readonly
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-primary focus:border-primary">
                                 </div>
                             </div>
                         </div>
@@ -676,5 +709,23 @@
                 }
             }, 5000);
         });
+
+        // Function สำหรับอัปเดตข้อมูลรถยนต์อัตโนมัติ
+        function updateCarInfo() {
+            const carSelect = document.getElementById('car_id');
+            const selectedOption = carSelect.options[carSelect.selectedIndex];
+
+            if (selectedOption.value) {
+                // อัปเดตข้อมูลรถยนต์
+                document.getElementById('car_brand').value = selectedOption.getAttribute('data-brand');
+                document.getElementById('car_license_plate').value = selectedOption.getAttribute('data-license');
+                document.getElementById('car_full_name').value = selectedOption.getAttribute('data-full-name');
+            } else {
+                // ล้างข้อมูลเมื่อไม่เลือกรถ
+                document.getElementById('car_brand').value = '';
+                document.getElementById('car_license_plate').value = '';
+                document.getElementById('car_full_name').value = '';
+            }
+        }
     </script>
 @endsection

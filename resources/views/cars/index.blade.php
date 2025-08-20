@@ -17,7 +17,6 @@
                         <div class="flex justify-between items-center">
                             <div>
                                 <h2 class="text-2xl font-bold text-gray-900">รายการรถยนต์ทั้งหมด</h2>
-                                <p class="text-gray-600 mt-1">จัดการข้อมูลรถยนต์ในระบบ</p>
                             </div>
                             <a href="{{ route('cars.create') }}"
                                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
@@ -30,9 +29,6 @@
 
                 <!-- DataTable Card -->
                 <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-900">ข้อมูลรถยนต์</h3>
-                    </div>
                     <div class="p-4">
                         <div class="overflow-x-auto">
                             <table id="carsTable" class="w-full">
