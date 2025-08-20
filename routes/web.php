@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RentalController;
+use App\Http\Controllers\MPDFController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -24,6 +25,23 @@ Route::middleware('auth')->group(function () {
     Route::delete('/rentals/{rental}', [RentalController::class, 'destroy'])->name('rentals.destroy');
     Route::get('/rentals/export', [RentalController::class, 'export'])->name('rentals.export');
 });
+
+// Routes สำหรับการทดสอบ PDF (ไม่ต้อง login)
+Route::prefix('pdf')->group(function () {
+    Route::get('/test', [MPDFController::class, 'generateSimplePDF'])->name('pdf.test');
+    Route::get('/rental-report', [MPDFController::class, 'generateRentalReport'])->name('pdf.rental-report');
+    Route::get('/monthly-report', [MPDFController::class, 'generateMonthlyReport'])->name('pdf.monthly-report');
+});
+
+// Routes สำหรับ PDF ที่ต้อง login
+Route::middleware('auth')->prefix('pdf')->group(function () {
+    Route::get('/receipt/{rental}', [MPDFController::class, 'generateRentalReceipt'])->name('pdf.receipt');
+});
+
+// หน้าเว็บทดสอบ PDF
+Route::get('/pdf-demo', function() {
+    return view('pdf.test-pdf');
+})->name('pdf.demo');
 
 Route::get('/test-rentals', function() {
     $rentals = App\Models\Rental::all();
