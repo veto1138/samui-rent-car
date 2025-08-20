@@ -277,7 +277,7 @@ class RentalController extends Controller
         $rightDotsNationalId = $dotsNationalId - $leftDotsNationalId;
 
         $address = $rental->address ?? ''; // สมมติว่ามีชื่อใน $user->name
-        $totalLengthAddress = 110; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+        $totalLengthAddress = 90; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
     
         $addressLength = mb_strlen($address, 'UTF-8');
         $dotsAddress = $totalLengthAddress - $addressLength;

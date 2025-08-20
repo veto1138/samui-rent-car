@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\MPDFController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CarController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -27,6 +28,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/rentals/export', [RentalController::class, 'export'])->name('rentals.export');
     // Route::get('/rentals/export-pdf/{rental}', [RentalController::class, 'exportPdf'])->name('rentals.export-pdf');
     Route::get('/rentals/export-pdf-single/{rental}', [RentalController::class, 'exportPdfSingle'])->name('rentals.export-pdf-single');
+});
+
+// Routes สำหรับจัดการรถยนต์
+Route::middleware('auth')->group(function () {
+    Route::resource('cars', CarController::class);
 });
 
 // Routes สำหรับจัดการผู้ใช้งาน

@@ -36,6 +36,9 @@ class RentalSeeder extends Seeder
             'owner_lastname' => 'เจ้าของ',
             'owner_witness_firstname' => 'สมศรี',
             'owner_witness_lastname' => 'พยานเจ้าของ',
+            'selfie_image' => null,
+            'national_id_image' => null,
+            'driver_license_image' => null,
         ]);
 
         Rental::create([
@@ -56,6 +59,9 @@ class RentalSeeder extends Seeder
             'car_license_plate' => 'ขค-5678',
             'status' => 'using',
             'write_address' => '456 ถนนรัชดาภิเษก แขวงดินแดง เขตดินแดง กรุงเทพฯ 10400',
+            'selfie_image' => null,
+            'national_id_image' => null,
+            'driver_license_image' => null,
         ]);
 
         Rental::create([
@@ -76,6 +82,9 @@ class RentalSeeder extends Seeder
             'car_license_plate' => 'คง-9012',
             'status' => 'success',
             'write_address' => '789 ถนนเพชรบุรี แขวงทุ่งพญาไท เขตราชเทวี กรุงเทพฯ 10400',
+            'selfie_image' => null,
+            'national_id_image' => null,
+            'driver_license_image' => null,
         ]);
     }
 }

@@ -26,8 +26,8 @@ return new class extends Migration
             $table->dateTime('end_date'); //วันที่สิ้นสุด
             $table->string('start_location', 150); //สถานที่เริ่ม
             $table->string('end_location', 150); //สถานที่สิ้นสุด
-            $table->string('selfie_image', 255); //รูปถ่ายตัวเอง
-            $table->string('national_id_image', 255); //รูปถ่ายบัตรประชาชน
+            $table->string('selfie_image', 255)->nullable(); //รูปถ่ายตัวเอง
+            $table->string('national_id_image', 255)->nullable(); //รูปถ่ายบัตรประชาชน
             $table->string('driver_license_image', 255)->nullable(); //รูปถ่ายใบขับขี่
             $table->string('car_brand', 100)->nullable(); //ยี่ห้อรถ
             $table->string('car_license_plate', 20)->nullable(); //ทะเบียนรถ
