@@ -89,6 +89,48 @@ class Rental extends Model
         return $this->end_date ? $this->end_date->format('d/m/Y H:i') : null;
     }
 
+    public function getThaiStartDateAttribute()
+    {
+        if (!$this->start_date) {
+            return null;
+        }
+        
+        $date = Carbon::parse($this->start_date);
+        $thaiMonths = [
+            1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม', 4 => 'เมษายน',
+            5 => 'พฤษภาคม', 6 => 'มิถุนายน', 7 => 'กรกฎาคม', 8 => 'สิงหาคม',
+            9 => 'กันยายน', 10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
+        ];
+        
+        return $date->day . ' ' . $thaiMonths[$date->month] . ' ' . ($date->year + 543) . ' เวลา ' . $date->format('H:i') . ' น.';
+    }
+
+    public function getThaiEndDateAttribute()
+    {
+        if (!$this->end_date) {
+            return null;
+        }
+        
+        $date = Carbon::parse($this->end_date);
+        $thaiMonths = [
+            1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม', 4 => 'เมษายน',
+            5 => 'พฤษภาคม', 6 => 'มิถุนายน', 7 => 'กรกฎาคม', 8 => 'สิงหาคม',
+            9 => 'กันยายน', 10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
+        ];
+        
+        return $date->day . ' ' . $thaiMonths[$date->month] . ' ' . ($date->year + 543) . ' เวลา ' . $date->format('H:i') . ' น.';
+    }
+
+    public function getStartTimeAttribute()
+    {
+        return $this->start_date ? $this->start_date->format('H:i') : null;
+    }
+
+    public function getEndTimeAttribute()
+    {
+        return $this->end_date ? $this->end_date->format('H:i') : null;
+    }
+
     public function getFormattedRentPriceAttribute()
     {
         return $this->rent_price ? '฿' . number_format($this->rent_price, 2) : null;
@@ -109,5 +151,53 @@ class Rental extends Model
         ];
         
         return $statusMap[$this->status] ?? 'ไม่ทราบสถานะ';
+    }
+
+    public function getRentPriceTextAttribute()
+    {
+        return $this->numberToThaiWords($this->rent_price);
+    }
+
+    public function getInsurancePriceTextAttribute()
+    {
+        return $this->numberToThaiWords($this->insurance_price);
+    }
+
+    private function numberToThaiWords($number)
+    {
+        $number = (int) $number;
+        
+        if ($number == 0) {
+            return 'ศูนย์';
+        }
+
+        $units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+        $digits = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+        
+        $result = '';
+        $position = 0;
+        
+        while ($number > 0) {
+            $digit = $number % 10;
+            $number = (int) ($number / 10);
+            
+            if ($digit > 0) {
+                if ($position == 1 && $digit == 1) {
+                    $result = 'สิบ' . $result;
+                } elseif ($position == 1 && $digit == 2) {
+                    $result = 'ยี่สิบ' . $result;
+                } elseif ($position == 1 && $digit > 2) {
+                    $result = $digits[$digit] . 'สิบ' . $result;
+                } elseif ($position == 0 && $digit == 1 && $number > 0) {
+                    $result = 'เอ็ด' . $result;
+                } else {
+                    $result = $digits[$digit] . $units[$position] . $result;
+                }
+            }
+            
+            $position++;
+        }
+        
+        return $result . 'บาทถ้วน';
     }
 }

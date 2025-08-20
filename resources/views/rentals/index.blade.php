@@ -250,10 +250,13 @@
                                      <i class="fas fa-edit"></i>    
                                     </button>
                                  </a>
-                                 <button class="bg-blue-500 w-11 h-11 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors duration-200" 
-                                         data-id="${row.id}" title="ลบ">
+                                 <a href="/rentals/export-pdf-single/${row.id}" 
+                                    title="ส่งออก PDF">
+                                    <button class="bg-blue-500 w-11 h-11 hover:bg-blue-600 text-white p-2 rounded-lg transition-colors duration-200" 
+                                            data-id="${row.id}" title="ส่งออก PDF">
                                      <i class="fas fa-file-export"></i>
                                  </button>
+                                 </a>
                                  <button class="bg-red-500 w-11 h-11 hover:bg-red-600 text-white p-2 rounded-lg transition-colors duration-200" 
                                          data-id="${row.id}" title="ลบ">
                                      <i class="fas fa-trash"></i>

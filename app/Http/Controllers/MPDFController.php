@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Mpdf\Mpdf;
-use App\Models\Rental;
-use Illuminate\Support\Facades\DB;
 use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
+use App\Models\Rental;
+use Illuminate\Support\Facades\DB;
+
 
 class MPDFController extends Controller 
 {

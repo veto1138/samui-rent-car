@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Rental;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
+use Mpdf\Mpdf;
+use Mpdf\Config\ConfigVariables;
+use Mpdf\Config\FontVariables;
 
 class RentalController extends Controller
 {
@@ -240,5 +243,57 @@ class RentalController extends Controller
             })
             ->rawColumns([])
             ->make(true);
+    }
+
+    public function exportPdfSingle(Rental $rental)
+    {
+        $defaultConfig = (new ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+
+        $defaultFontConfig = (new FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        // dd($rental);
+        // ส่งข้อมูลการเช่าตาม ID ที่ส่งเข้ามา
+        $data = [
+            'rental' => $rental
+        ];
+
+        // ตรวจสอบข้อมูลและ accessor
+        // dd([
+        //     'rental_id' => $rental->id,
+        //     'start_date' => $rental->start_date,
+        //     'end_date' => $rental->end_date,
+        //     'start_time' => $rental->start_time,
+        //     'end_time' => $rental->end_time,
+        //     'thai_start_date' => $rental->thai_start_date,
+        //     'thai_end_date' => $rental->thai_end_date,
+        //     'formatted_start_date' => $rental->formatted_start_date,
+        //     'formatted_end_date' => $rental->formatted_end_date,
+        // ]);
+        
+        $html = view('pdf.rental-report', $data)->render();
+
+        $mpdf = new Mpdf([
+            'fontDir' => array_merge($fontDirs, [storage_path('fonts')]),
+            'fontdata' => $fontData + [
+                'thsarabun' => [
+                    'R'  => 'THSarabunNew.ttf',
+                    'B'  => 'THSarabunNew-Bold.ttf',
+                    'I'  => 'THSarabunNew-Italic.ttf',
+                    'BI' => 'THSarabunNew-BoldItalic.ttf',
+                ]
+            ],
+            'default_font' => 'thsarabun'
+        ]);
+        
+        $mpdf->SetDefaultFont('Sarabun');
+        $mpdf->WriteHTML($html);
+        
+        // ตั้งชื่อไฟล์ตามข้อมูลการเช่า
+        $filename = 'car-rental-agreement-' . $rental->id . '-' . $rental->full_name . '.pdf';
+        $filename = str_replace(' ', '-', $filename); // แทนที่ช่องว่างด้วย -
+        
+        return $mpdf->Output($filename, 'D');
     }
 }

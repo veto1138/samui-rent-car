@@ -28,19 +28,16 @@
                 <ul class="flex items-center gap-6">
                     <li>
                         <a href="{{ route('rentals.index') }}">
-                            <i class="fas fa-car text-xl text-secondary"></i>
                             <span>รายการจองรถ</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('rentals.index') }}">
-                            <i class="fas fa-car text-xl text-secondary"></i>
                             <span>ยี่ห้อรถ</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('rentals.index') }}">
-                            <i class="fas fa-users text-xl text-secondary"></i>
                             <span>ผู้ใช้งาน</span>
                         </a>
                     </li>

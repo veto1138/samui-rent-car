@@ -24,6 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/rentals/{rental}', [RentalController::class, 'update'])->name('rentals.update');
     Route::delete('/rentals/{rental}', [RentalController::class, 'destroy'])->name('rentals.destroy');
     Route::get('/rentals/export', [RentalController::class, 'export'])->name('rentals.export');
+    // Route::get('/rentals/export-pdf/{rental}', [RentalController::class, 'exportPdf'])->name('rentals.export-pdf');
+    Route::get('/rentals/export-pdf-single/{rental}', [RentalController::class, 'exportPdfSingle'])->name('rentals.export-pdf-single');
 });
 
 // Routes สำหรับการทดสอบ PDF (ไม่ต้อง login)

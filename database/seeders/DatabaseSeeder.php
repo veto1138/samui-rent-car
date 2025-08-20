@@ -19,5 +19,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // เพิ่มข้อมูลการเช่ารถตัวอย่าง
+        $this->call([
+            RentalSeeder::class,
+        ]);
     }
 }
