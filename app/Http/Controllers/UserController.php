@@ -10,10 +10,17 @@ use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate(10);
-        return view('users.index', compact('users'));
+        if ($request->ajax()) {
+            $users = User::select(['id', 'name', 'email', 'phone', 'created_at'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+            
+            return response()->json(['data' => $users]);
+        }
+        
+        return view('users.index');
     }
 
     public function create()
@@ -63,14 +70,21 @@ class UserController extends Controller
             ->with('success', 'ข้อมูลผู้ใช้งานถูกอัปเดตเรียบร้อยแล้ว');
     }
 
-    public function destroy(User $user)
+    public function destroy(User $user, Request $request)
     {
         if ($user->id === auth()->id()) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'ไม่สามารถลบบัญชีของตัวเองได้'], 400);
+            }
             return redirect()->route('users.index')
                 ->with('error', 'ไม่สามารถลบบัญชีของตัวเองได้');
         }
 
         $user->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => 'ผู้ใช้งานถูกลบเรียบร้อยแล้ว']);
+        }
 
         return redirect()->route('users.index')
             ->with('success', 'ผู้ใช้งานถูกลบเรียบร้อยแล้ว');

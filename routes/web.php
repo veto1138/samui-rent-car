@@ -35,40 +35,40 @@ Route::middleware('auth')->group(function () {
 });
 
 // Routes สำหรับการทดสอบ PDF (ไม่ต้อง login)
-Route::prefix('pdf')->group(function () {
-    Route::get('/test', [MPDFController::class, 'generateSimplePDF'])->name('pdf.test');
-    Route::get('/rental-report', [MPDFController::class, 'generateRentalReport'])->name('pdf.rental-report');
-    Route::get('/monthly-report', [MPDFController::class, 'generateMonthlyReport'])->name('pdf.monthly-report');
-});
+// Route::prefix('pdf')->group(function () {
+//     Route::get('/test', [MPDFController::class, 'generateSimplePDF'])->name('pdf.test');
+//     Route::get('/rental-report', [MPDFController::class, 'generateRentalReport'])->name('pdf.rental-report');
+//     Route::get('/monthly-report', [MPDFController::class, 'generateMonthlyReport'])->name('pdf.monthly-report');
+// });
 
-// Routes สำหรับ PDF ที่ต้อง login
-Route::middleware('auth')->prefix('pdf')->group(function () {
-    Route::get('/receipt/{rental}', [MPDFController::class, 'generateRentalReceipt'])->name('pdf.receipt');
-});
+// // Routes สำหรับ PDF ที่ต้อง login
+// Route::middleware('auth')->prefix('pdf')->group(function () {
+//     Route::get('/receipt/{rental}', [MPDFController::class, 'generateRentalReceipt'])->name('pdf.receipt');
+// });
 
 // หน้าเว็บทดสอบ PDF
-Route::get('/pdf-demo', function() {
-    return view('pdf.test-pdf');
-})->name('pdf.demo');
+// Route::get('/pdf-demo', function() {
+//     return view('pdf.test-pdf');
+// })->name('pdf.demo');
 
-Route::get('/test-rentals', function() {
-    $rentals = App\Models\Rental::all();
-    return response()->json([
-        'count' => $rentals->count(),
-        'rentals' => $rentals->take(3)->map(function($rental) {
-            return [
-                'id' => $rental->id,
-                'firstname' => $rental->firstname,
-                'lastname' => $rental->lastname,
-                'phone' => $rental->phone,
-                'status' => $rental->status,
-                'start_date' => $rental->start_date,
-                'end_date' => $rental->end_date
-            ];
-        })
-    ]);
-});
+// Route::get('/test-rentals', function() {
+//     $rentals = App\Models\Rental::all();
+//     return response()->json([
+//         'count' => $rentals->count(),
+//         'rentals' => $rentals->take(3)->map(function($rental) {
+//             return [
+//                 'id' => $rental->id,
+//                 'firstname' => $rental->firstname,
+//                 'lastname' => $rental->lastname,
+//                 'phone' => $rental->phone,
+//                 'status' => $rental->status,
+//                 'start_date' => $rental->start_date,
+//                 'end_date' => $rental->end_date
+//             ];
+//         })
+//     ]);
+// });
 
-Route::get('/test', function() {
-    return view('pages.test');
-});
+// Route::get('/test', function() {
+//     return view('pages.test');
+// });

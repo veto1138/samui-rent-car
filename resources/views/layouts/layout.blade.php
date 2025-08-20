@@ -33,7 +33,7 @@
                     </li>
                     <li>
                         <a href="{{ route('rentals.index') }}">
-                            <span>ยี่ห้อรถ</span>
+                            <span>รายการจองรถ</span>
                         </a>
                     </li>
                     <li>
