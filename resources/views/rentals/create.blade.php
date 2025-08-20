@@ -457,7 +457,10 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <!-- Header -->
         <div class="text-center mb-0">
-            <h2 class="text-3xl font-bold text-secondary mb-2 ">แบบฟอร์มการเช่ารถ</h2>
+            <h2 class="text-3xl font-bold text-secondary mb-2 flex items-center justify-center">
+                จองรถเช่า Nalin group 1997
+                <img src="{{ asset('images/logo-2.png') }}" alt="Nalin group 1997" class="w-16 h-auto ml-6">
+            </h2>
         </div>
 
         <!-- Success Message -->
@@ -514,10 +517,13 @@
         <form method="POST" action="{{ route('rentals.store') }}" enctype="multipart/form-data" class="space-y-8">
             @csrf
 
+            <!-- Hidden field for status -->
+            <input type="hidden" name="status" value="pending">
+
             <!-- ข้อมูลส่วนตัว -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-primary px-6 py-4">
-                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+                <div class="bg-secondary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-primary flex items-center ">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -580,7 +586,7 @@
                             <input id="address"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 type="text" name="address" value="{{ old('address') }}" required
-                                placeholder="บ้านเลขที่ 70 หมู่บ้าน ศุภาลัย ซอย มังกร 1 ถนน หลวง หมู่ 5 ต.ผักแว่น อ.จังหาร จ.สกลนคร 67250" />
+                                placeholder="70 หมู่บ้าน ศุภาลัย ซอย มังกร 1 ถนน หลวง หมู่ 5 ต.ผักแว่น อ.จังหาร จ.สกลนคร 67250" />
                             @error('address')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -591,8 +597,8 @@
 
             <!-- ข้อมูลพยาน -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-primary px-6 py-4">
-                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+                <div class="bg-secondary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-primary flex items-center ">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
@@ -636,8 +642,8 @@
 
             <!-- ข้อมูลการเช่า -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-primary px-6 py-4">
-                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+                <div class="bg-secondary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-primary flex items-center ">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -649,8 +655,8 @@
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label for="start_date"
-                                class="block text-sm font-medium text-gray-700">วันที่และเวลาเริ่มเช่า *</label>
+                            <label for="start_date" class="block text-sm font-medium text-gray-700">วันที่และเวลารับรถ
+                                *</label>
                             <input id="start_date"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 type="text" name="start_date" value="{{ old('start_date') }}" required
@@ -661,8 +667,8 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label for="end_date"
-                                class="block text-sm font-medium text-gray-700">วันที่และเวลาสิ้นสุดการเช่า *</label>
+                            <label for="end_date" class="block text-sm font-medium text-gray-700">วันที่และเวลาคืนรถ
+                                *</label>
                             <input id="end_date"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 type="text" name="end_date" value="{{ old('end_date') }}" required
@@ -678,35 +684,62 @@
                             <input id="start_location"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 type="text" name="start_location" value="{{ old('start_location') }}" required
-                                placeholder="เช่น สนามบินดอนเมือง, เมกะบางนา, โรงแรมในกรุงเทพ" />
+                                placeholder="เช่น สนามบิน ท่าเรือหน้าทอน  โรงแรม" />
                             @error('start_location')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="space-y-2">
-                            <label for="end_location" class="block text-sm font-medium text-gray-700">สถานที่ส่งรถ
+                            <label for="end_location" class="block text-sm font-medium text-gray-700">สถานที่คืนรถ
                                 *</label>
                             <input id="end_location"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 type="text" name="end_location" value="{{ old('end_location') }}" required
-                                placeholder="เช่น สนามบินดอนเมือง, เมกะบางนา, โรงแรมในกรุงเทพ" />
+                                placeholder="เช่น สนามบิน ท่าเรือหน้าทอน  โรงแรม" />
                             @error('end_location')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
-
-
                 </div>
             </div>
-
-
+            <!-- สถานะการเช่า -->
+            {{-- <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-orange-500 px-6 py-4">
+                    <h3 class="text-xl font-semibold text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        สถานะการเช่า
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">สถานะ: <span
+                                    class="text-orange-600 font-semibold">รอจอง</span></p>
+                            <p class="text-sm text-gray-500">ข้อมูลการเช่าจะถูกส่งไปยังเจ้าหน้าที่เพื่อตรวจสอบและยืนยัน
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div> --}}
 
             <!-- อัปโหลดรูปภาพ -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-primary px-6 py-4">
-                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+            <div class="bg-white rounded-2xl shadow-lg  overflow-hidden">
+                <div class="bg-secondary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-primary flex items-center ">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -795,7 +828,7 @@
             <!-- Submit Button -->
             <div class="text-center">
                 <button type="submit"
-                    class="inline-flex items-center px-8 py-4 bg-primary border border-transparent rounded-2xl text-secondary font-semibold text-lg uppercase tracking-widest hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl ">
+                    class="inline-flex items-center px-8 py-4 bg-secondary border border-transparent rounded-2xl text-primary font-semibold text-lg uppercase tracking-widest hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl ">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
                         </path>

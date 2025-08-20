@@ -390,11 +390,12 @@ class GoogleCalendarService
     {
         switch ($status) {
             case 'pending':
-                return '[รอ]';
+                return '[รอจอง]';
+            case 'booked':
+                return '[จองแล้ว]';
             case 'using':
-                return '[ใช้งาน]';
+                return '[กำลังใช้งาน]';
             case 'success':
-            case 'returned':
                 return '[เสร็จสิ้น]';
             case 'cancel':
                 return '[ยกเลิก]';
@@ -410,12 +411,13 @@ class GoogleCalendarService
     {
         switch ($status) {
             case 'pending':
+                return '1'; //ม่วงอ่อน
+            case 'booked':
                 return '5'; // สีเหลือง
             case 'using':
-                return '2'; // สีเขียว
+                return '7'; // สีน้ำเงิน
             case 'success':
-            case 'returned':
-                return '11'; // สีแดง
+                return '2'; // สีเขียว
             case 'cancel':
                 return '8'; // สีเทา
             default:
@@ -423,6 +425,7 @@ class GoogleCalendarService
         }
     }
 
+    //รอจอง ม่วงอ่อน
     /**
      * ดึง Calendar ID ที่ใช้งานอยู่
      */

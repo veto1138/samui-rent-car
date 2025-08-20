@@ -17,12 +17,12 @@
                     <div class="p-4">
                         <div class="flex items-center justify-between">
                             <h2 class="text-lg font-semibold text-gray-900">รายการจองรถทั้งหมด</h2>
-                            <div class="flex space-x-3">
+                            {{-- <div class="flex space-x-3">
                                 <a href="{{ route('google-calendar.index') }}"
                                     class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
                                     <i class="fas fa-calendar-alt mr-2"></i>จัดการ Google Calendar
                                 </a>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                     <div class="p-4">
@@ -48,11 +48,11 @@
                                         <th
                                             class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             วันที่สิ้นสุด</th>
-                                        <th
+                                        {{-- <th
                                             class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            จำนวนวัน</th>
+                                            จำนวนวัน</th> --}}
                                         <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             ราคาเช่า</th>
                                         <th
                                             class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -198,25 +198,25 @@
                         },
                         width: '120px'
                     },
-                    {
-                        data: 'rental_days',
+                    // {
+                    //     data: 'rental_days',
 
-                        width: '100px',
-                        className: 'text-center',
-                        orderable: true,
-                        render: function(data, type, row) {
-                            return data ?
-                                `<div class="text-center px-2 py-[2px] bg-secondary text-white rounded-md text-sm">${data} วัน</div>` :
-                                '-';
-                        },
-                    },
+                    //     width: '100px',
+                    //     className: 'text-center',
+                    //     orderable: true,
+                    //     render: function(data, type, row) {
+                    //         return data ?
+                    //             `<div class="text-center px-2 py-[2px] bg-secondary text-white rounded-md text-sm">${data} วัน</div>` :
+                    //             '-';
+                    //     },
+                    // },
                     {
                         data: 'rent_price',
                         render: function(data, type, row) {
                             return data ? '฿' + parseFloat(data).toLocaleString('th-TH') : '-';
                         },
                         width: '120px',
-                        className: 'text-end'
+                        className: 'text-center'
                     },
                     {
                         data: 'status',
@@ -226,7 +226,11 @@
                             let statusClass = '';
                             switch (data) {
                                 case 'pending':
-                                    statusText = 'จอง';
+                                    statusText = 'รอจอง';
+                                    statusClass = 'bg-orange-400 text-white';
+                                    break;
+                                case 'booked':
+                                    statusText = 'จองแล้ว';
                                     statusClass = 'bg-yellow-400 text-white';
                                     break;
                                 case 'using':

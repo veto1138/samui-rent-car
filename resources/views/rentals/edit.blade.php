@@ -423,7 +423,11 @@
                                         <option value="">เลือกสถานะ</option>
                                         <option value="pending"
                                             {{ old('status', $rental->status) == 'pending' ? 'selected' : '' }}>
-                                            รอดำเนินการ
+                                            รอจอง
+                                        </option>
+                                        <option value="booked"
+                                            {{ old('status', $rental->status) == 'booked' ? 'selected' : '' }}>
+                                            จองแล้ว
                                         </option>
                                         <option value="using"
                                             {{ old('status', $rental->status) == 'using' ? 'selected' : '' }}>

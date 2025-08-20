@@ -137,7 +137,8 @@ class RentalController extends Controller
             }
 
             $data = $request->all();
-            $data['status'] = 'pending';
+            // ใช้สถานะที่ส่งมาจากฟอร์ม (pending) หรือ default เป็น pending
+            $data['status'] = $request->input('status', 'pending');
 
             // Handle file uploads
             if ($request->hasFile('selfie_image')) {
@@ -206,7 +207,7 @@ class RentalController extends Controller
                 'witness_lastname' => 'required|string|max:100',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after_or_equal:start_date',
-                'status' => 'required|in:pending,using,success,cancel',
+                'status' => 'required|in:pending,booked,using,success,cancel',
                 'car_id' => 'nullable|exists:cars,id',
                 'car_brand' => 'nullable|string|max:100',
                 'car_license_plate' => 'nullable|string|max:20',

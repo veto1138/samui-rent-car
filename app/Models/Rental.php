@@ -147,7 +147,8 @@ class Rental extends Model
     public function getStatusTextAttribute()
     {
         $statusMap = [
-            'pending' => 'รอดำเนินการ',
+            'pending' => 'รอจอง',
+            'booked' => 'จองแล้ว',
             'using' => 'กำลังใช้งาน',
             'success' => 'เสร็จสิ้น',
             'cancel' => 'ยกเลิก'
@@ -307,6 +308,12 @@ class Rental extends Model
             })
             ->with('car')
             ->get();
+    }
+
+    // Relationships
+    public function car()
+    {
+        return $this->belongsTo(Car::class);
     }
 
     // Google Calendar Accessors
