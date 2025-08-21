@@ -15,53 +15,47 @@ class CarSeeder extends Seeder
     {
         $cars = [
             [
-                'full_name' => 'Toyota Camry',
-                'brand_name' => 'Camry',
-                'license_plate' => 'กข-1234',
+                'full_name' => 'Toyota Yaris สีแดง',
+                'brand_name' => 'Toyota',
+                'license_plate' => '4ขภ 5346 กรุงเทพมหานคร',
                 'status' => 'available',
             ],
             [
-                'full_name' => 'Honda Civic',
-                'brand_name' => 'Civic',
-                'license_plate' => 'กข-5678',
+                'full_name' => 'Toyota Revo สีบรอนเทา',
+                'brand_name' => 'Toyota',
+                'license_plate' => '1ขข 4338 กรุงเทพมหานคร',
                 'status' => 'available',
             ],
             [
-                'full_name' => 'Toyota Fortuner',
-                'brand_name' => 'Fortuner',
-                'license_plate' => 'กข-9012',
+                'full_name' => 'MG รุ่น MG5 สีบรอนฟ้า',
+                'brand_name' => 'MG',
+                'license_plate' => '6กข 3987 กรุงเทพมหานคร',
                 'status' => 'rented',
             ],
             [
-                'full_name' => 'Honda CR-V',
-                'brand_name' => 'CR-V',
-                'license_plate' => 'กข-3456',
+                'full_name' => 'MG รุ่น MG5 สีขาว',
+                'brand_name' => 'MG',
+                'license_plate' => '7กม 1607 กรุงเทพมหานคร',
                 'status' => 'available',
             ],
             [
-                'full_name' => 'Mazda CX-5',
-                'brand_name' => 'CX-5',
-                'license_plate' => 'กข-7890',
+                'full_name' => 'MG รุ่น MG5 สีดำ',
+                'brand_name' => 'MG',
+                'license_plate' => 'กย 9303 นครศรีธรรมราช',
                 'status' => 'maintenance',
             ],
             [
-                'full_name' => 'Nissan X-Trail',
-                'brand_name' => 'X-Trail',
-                'license_plate' => 'กข-2345',
+               'full_name' => 'MG รุ่น MG5 สีดำ',
+                'brand_name' => 'MG',
+                'license_plate' => '3ขต 3383 กรุงเทพมหานคร',
                 'status' => 'available',
             ],
             [
-                'full_name' => 'Toyota Vios',
-                'brand_name' => 'Vios',
-                'license_plate' => 'กข-6789',
+                'full_name' => 'MG รุ่น MG6 สีบรอนเงิน',
+                'brand_name' => 'MG',
+                'license_plate' => '5กฌ 5528 กรุงเทพมหานคร',
                 'status' => 'available',
-            ],
-            [
-                'full_name' => 'Honda City',
-                'brand_name' => 'City',
-                'license_plate' => 'กข-0123',
-                'status' => 'rented',
-            ],
+            ]
         ];
 
         foreach ($cars as $car) {
