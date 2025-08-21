@@ -421,11 +421,7 @@
                 });
             });
 
-            // จัดการการส่งออกข้อมูล
-            $('#exportBtn').click(function() {
-                window.location.href = '{{ route('rentals.export') }}';
-            });
-
+            // // จัดการการส่งออกข้อมูล
             // เพิ่ม loading indicator
             $(document).on('ajaxStart', function() {
                 $('body').append(
