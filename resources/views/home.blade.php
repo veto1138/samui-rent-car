@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แบบฟอร์มการเช่ารถ</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Flatpickr CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -284,11 +286,76 @@
             }
         }
 
+        // Function สำหรับจัดการการแสดง/ซ่อน input "อื่นๆ"
+        function toggleOtherInput(selectId, otherInputId) {
+            const select = document.getElementById(selectId);
+            const otherInput = document.getElementById(otherInputId);
+
+            // ล้าง error state
+            select.classList.remove('border-red-500');
+            select.classList.add('border-gray-300');
+
+            // ล้าง error message
+            const errorElement = otherInput.querySelector('.text-red-600');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+
+            if (select.value === 'อื่นๆ') {
+                otherInput.style.display = 'block';
+                otherInput.querySelector('input').required = true;
+            } else {
+                otherInput.style.display = 'none';
+                otherInput.querySelector('input').required = false;
+                otherInput.querySelector('input').value = '';
+                otherInput.querySelector('input').classList.remove('border-red-500');
+                otherInput.querySelector('input').classList.add('border-gray-300');
+            }
+        }
+
         // เพิ่ม Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             const nationalIdInput = document.getElementById('national_id');
             const phoneInput = document.getElementById('phone');
             const form = document.querySelector('form');
+
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+
+            // ตรวจสอบค่าเริ่มต้นสำหรับ input "อื่นๆ"
+            toggleOtherInput('start_location', 'start_location_other');
+            toggleOtherInput('end_location', 'end_location_other');
+
+            // จัดการ error state สำหรับ input "อื่นๆ" เมื่อมี validation error
+            if (document.querySelector('.text-red-600')) {
+                const startLocationSelect = document.getElementById('start_location');
+                const endLocationSelect = document.getElementById('end_location');
+
+                if (startLocationSelect.value === 'อื่นๆ') {
+                    document.getElementById('start_location_other').style.display = 'block';
+                }
+                if (endLocationSelect.value === 'อื่นๆ') {
+                    document.getElementById('end_location_other').style.display = 'block';
+                }
+            }
+
+            // เพิ่ม event listener สำหรับล้าง error state เมื่อพิมพ์ใน input "อื่นๆ"
+            const startLocationOtherInput = document.querySelector('#start_location_other input');
+            const endLocationOtherInput = document.querySelector('#end_location_other input');
+
+            if (startLocationOtherInput) {
+                startLocationOtherInput.addEventListener('input', function() {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-gray-300');
+                });
+            }
+
+            if (endLocationOtherInput) {
+                endLocationOtherInput.addEventListener('input', function() {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-gray-300');
+                });
+            }
 
             // แสดง SweetAlert2 เมื่อมี session success
             const successMessage = document.getElementById('success-message');
@@ -307,6 +374,12 @@
                     }
                 });
             }
+
+
+
+
+
+
 
             if (nationalIdInput) {
                 // ป้องกันการกรอกผิดตั้งแต่ต้น
@@ -378,7 +451,7 @@
                 });
             }
 
-            // เพิ่ม Form Validation ก่อนส่ง
+            // เพิ่ม Form Validation และ Loading ก่อนส่ง
             if (form) {
                 form.addEventListener('submit', function(e) {
                     let isValid = true;
@@ -398,6 +471,38 @@
                         phoneInput.parentElement.querySelector('.text-red-600').style.display = 'block';
                     }
 
+                    // ตรวจสอบสถานที่รับรถ
+                    const startLocationSelect = document.getElementById('start_location');
+                    const startLocationOther = document.getElementById('start_location_other');
+                    if (startLocationSelect.value === '') {
+                        isValid = false;
+                        startLocationSelect.classList.add('border-red-500');
+                    } else if (startLocationSelect.value === 'อื่นๆ') {
+                        const otherInput = startLocationOther.querySelector('input');
+                        if (!otherInput.value.trim()) {
+                            isValid = false;
+                            otherInput.classList.add('border-red-500');
+                            // แสดง input "อื่นๆ" เพื่อให้ผู้ใช้เห็น error
+                            startLocationOther.style.display = 'block';
+                        }
+                    }
+
+                    // ตรวจสอบสถานที่คืนรถ
+                    const endLocationSelect = document.getElementById('end_location');
+                    const endLocationOther = document.getElementById('end_location_other');
+                    if (endLocationSelect.value === '') {
+                        isValid = false;
+                        endLocationSelect.classList.add('border-red-500');
+                    } else if (endLocationSelect.value === 'อื่นๆ') {
+                        const otherInput = endLocationOther.querySelector('input');
+                        if (!otherInput.value.trim()) {
+                            isValid = false;
+                            otherInput.classList.add('border-red-500');
+                            // แสดง input "อื่นๆ" เพื่อให้ผู้ใช้เห็น error
+                            endLocationOther.style.display = 'block';
+                        }
+                    }
+
                     if (!isValid) {
                         e.preventDefault();
                         Swal.fire({
@@ -415,6 +520,27 @@
                         });
                         return false;
                     }
+
+                    // แสดง Loading หลังกด Submit
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+
+                    submitBtn.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        กำลังบันทึกข้อมูล...
+                    `;
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+
+                    // ตั้งเวลาเพื่อคืนค่าปุ่มหลังจาก 5 วินาที (กรณีที่เกิดข้อผิดพลาด)
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    }, 5000);
                 });
             }
         });
@@ -425,7 +551,10 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <!-- Header -->
         <div class="text-center mb-0">
-            <h2 class="text-3xl font-bold text-secondary mb-2 ">แบบฟอร์มการเช่ารถ</h2>
+            <h2 class="text-3xl font-bold text-secondary mb-2 flex items-center justify-center">
+                จองรถเช่า Nalin group 1997
+                <img src="{{ asset('images/logo-2.png') }}" alt="Nalin group 1997" class="w-16 h-auto ml-6">
+            </h2>
         </div>
 
         <!-- Success Message -->
@@ -482,10 +611,13 @@
         <form method="POST" action="{{ route('rentals.store') }}" enctype="multipart/form-data" class="space-y-8">
             @csrf
 
+            <!-- Hidden field for status -->
+            <input type="hidden" name="status" value="pending">
+
             <!-- ข้อมูลส่วนตัว -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-primary px-6 py-4">
-                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+                <div class="bg-secondary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-primary flex items-center ">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -548,7 +680,7 @@
                             <input id="address"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 type="text" name="address" value="{{ old('address') }}" required
-                                placeholder="บ้านเลขที่ 70 หมู่บ้าน ศุภาลัย ซอย มังกร 1 ถนน หลวง หมู่ 5 ต.ผักแว่น อ.จังหาร จ.สกลนคร 67250" />
+                                placeholder="70 หมู่บ้าน ศุภาลัย ซอย มังกร 1 ถนน หลวง หมู่ 5 ต.ผักแว่น อ.จังหาร จ.สกลนคร 67250" />
                             @error('address')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -559,8 +691,8 @@
 
             <!-- ข้อมูลพยาน -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-primary px-6 py-4">
-                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+                <div class="bg-secondary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-primary flex items-center ">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
@@ -604,8 +736,8 @@
 
             <!-- ข้อมูลการเช่า -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-primary px-6 py-4">
-                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+                <div class="bg-secondary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-primary flex items-center ">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -617,8 +749,8 @@
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label for="start_date"
-                                class="block text-sm font-medium text-gray-700">วันที่และเวลาเริ่มเช่า *</label>
+                            <label for="start_date" class="block text-sm font-medium text-gray-700">วันที่และเวลารับรถ
+                                *</label>
                             <input id="start_date"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 type="text" name="start_date" value="{{ old('start_date') }}" required
@@ -629,8 +761,8 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label for="end_date"
-                                class="block text-sm font-medium text-gray-700">วันที่และเวลาสิ้นสุดการเช่า *</label>
+                            <label for="end_date" class="block text-sm font-medium text-gray-700">วันที่และเวลาคืนรถ
+                                *</label>
                             <input id="end_date"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                 type="text" name="end_date" value="{{ old('end_date') }}" required
@@ -643,38 +775,113 @@
                         <div class="space-y-2">
                             <label for="start_location" class="block text-sm font-medium text-gray-700">สถานที่รับรถ
                                 *</label>
-                            <input id="start_location"
+                            <select id="start_location" name="start_location"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                type="text" name="start_location" value="{{ old('start_location') }}" required
-                                placeholder="เช่น สนามบินดอนเมือง, เมกะบางนา, โรงแรมในกรุงเทพ" />
+                                required onchange="toggleOtherInput('start_location', 'start_location_other')">
+                                <option value="">เลือกสถานที่รับรถ</option>
+                                <option value="สนามบิน" {{ old('start_location') == 'สนามบิน' ? 'selected' : '' }}>
+                                    สนามบิน</option>
+                                <option value="ท่าเรือซีทรานหน้าทอน"
+                                    {{ old('start_location') == 'ท่าเรือซีทรานหน้าทอน' ? 'selected' : '' }}>
+                                    ท่าเรือซีทรานหน้าทอน</option>
+                                <option value="ท่าเรือราชาเฟอรี่"
+                                    {{ old('start_location') == 'ท่าเรือราชาเฟอรี่' ? 'selected' : '' }}>
+                                    ท่าเรือราชาเฟอรี่</option>
+                                <option value="ท่าเรือหน้าพระลาน"
+                                    {{ old('start_location') == 'ท่าเรือหน้าพระลาน' ? 'selected' : '' }}>
+                                    ท่าเรือหน้าพระลาน</option>
+                                <option value="เซลทรัลสมุย"
+                                    {{ old('start_location') == 'เซลทรัลสมุย' ? 'selected' : '' }}>เซลทรัลสมุย</option>
+                                <option value="อื่นๆ" {{ old('start_location') == 'อื่นๆ' ? 'selected' : '' }}>อื่นๆ
+                                </option>
+                            </select>
+                            <div id="start_location_other" class="mt-2" style="display: none;">
+                                <input type="text" name="start_location_other"
+                                    class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                    placeholder="ระบุสถานที่รับรถ" value="{{ old('start_location_other') }}" />
+                                @error('start_location_other')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                             @error('start_location')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="space-y-2">
-                            <label for="end_location" class="block text-sm font-medium text-gray-700">สถานที่ส่งรถ
+                            <label for="end_location" class="block text-sm font-medium text-gray-700">สถานที่คืนรถ
                                 *</label>
-                            <input id="end_location"
+                            <select id="end_location" name="end_location"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                type="text" name="end_location" value="{{ old('end_location') }}" required
-                                placeholder="เช่น สนามบินดอนเมือง, เมกะบางนา, โรงแรมในกรุงเทพ" />
+                                required onchange="toggleOtherInput('end_location', 'end_location_other')">
+                                <option value="">เลือกสถานที่คืนรถ</option>
+                                <option value="สนามบิน" {{ old('end_location') == 'สนามบิน' ? 'selected' : '' }}>
+                                    สนามบิน</option>
+                                <option value="ท่าเรือซีทรานหน้าทอน"
+                                    {{ old('end_location') == 'ท่าเรือซีทรานหน้าทอน' ? 'selected' : '' }}>
+                                    ท่าเรือซีทรานหน้าทอน</option>
+                                <option value="ท่าเรือราชาเฟอรี่"
+                                    {{ old('end_location') == 'ท่าเรือราชาเฟอรี่' ? 'selected' : '' }}>
+                                    ท่าเรือราชาเฟอรี่</option>
+                                <option value="ท่าเรือหน้าพระลาน"
+                                    {{ old('end_location') == 'ท่าเรือหน้าพระลาน' ? 'selected' : '' }}>
+                                    ท่าเรือหน้าพระลาน</option>
+                                <option value="เซลทรัลสมุย"
+                                    {{ old('end_location') == 'เซลทรัลสมุย' ? 'selected' : '' }}>เซลทรัลสมุย</option>
+                                <option value="อื่นๆ" {{ old('end_location') == 'อื่นๆ' ? 'selected' : '' }}>อื่นๆ
+                                </option>
+                            </select>
+                            <div id="end_location_other" class="mt-2" style="display: none;">
+                                <input type="text" name="end_location_other"
+                                    class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-500"
+                                    placeholder="ระบุสถานที่คืนรถ" value="{{ old('end_location_other') }}" />
+                                @error('end_location_other')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                             @error('end_location')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
-                    <p class="text-sm text-gray-500 mt-4">
-                        <span class="text-red-500">*</span>
-                        กรุณาเลือกวันที่ เวลา และสถานที่ที่ชัดเจน เพื่อความสะดวกในการจัดส่งรถ (เวลาเลือกได้ทีละ 10 นาที)
-                    </p>
                 </div>
             </div>
+            <!-- สถานะการเช่า -->
+            {{-- <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-orange-500 px-6 py-4">
+                    <h3 class="text-xl font-semibold text-white flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        สถานะการเช่า
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">สถานะ: <span
+                                    class="text-orange-600 font-semibold">รอจอง</span></p>
+                            <p class="text-sm text-gray-500">ข้อมูลการเช่าจะถูกส่งไปยังเจ้าหน้าที่เพื่อตรวจสอบและยืนยัน
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div> --}}
 
             <!-- อัปโหลดรูปภาพ -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="bg-primary px-6 py-4">
-                    <h3 class="text-xl font-semibold text-secondary flex items-center ">
+            <div class="bg-white rounded-2xl shadow-lg  overflow-hidden">
+                <div class="bg-secondary px-6 py-4">
+                    <h3 class="text-xl font-semibold text-primary flex items-center ">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -763,7 +970,7 @@
             <!-- Submit Button -->
             <div class="text-center">
                 <button type="submit"
-                    class="inline-flex items-center px-8 py-4 bg-primary border border-transparent rounded-2xl text-secondary font-semibold text-lg uppercase tracking-widest hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl ">
+                    class="inline-flex items-center px-8 py-4 bg-secondary border border-transparent rounded-2xl text-primary font-semibold text-lg uppercase tracking-widest hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl ">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
                         </path>

@@ -19,6 +19,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // })->middleware('auth')->name('dashboard');
 
 Route::get('/', [RentalController::class, 'create'])->name('rentals.create');
+Route::post('/rentals', [RentalController::class, 'store'])->name('rentals.store');
 Route::prefix('google-calendar')->group(function () {
     Route::post('/rentals/{rental}/add', [GoogleCalendarController::class, 'addToCalendar'])->name('google-calendar.rentals.add');
 });
@@ -26,13 +27,9 @@ Route::prefix('google-calendar')->group(function () {
 // Routes สำหรับการเช่ารถ
 Route::middleware('auth')->group(function () {
     Route::get('/rentals', [RentalController::class, 'index'])->name('rentals.index');
-    
-    Route::post('/rentals', [RentalController::class, 'store'])->name('rentals.store');
     Route::get('/rentals/{rental}/edit', [RentalController::class, 'edit'])->name('rentals.edit');
     Route::put('/rentals/{rental}', [RentalController::class, 'update'])->name('rentals.update');
     Route::delete('/rentals/{rental}', [RentalController::class, 'destroy'])->name('rentals.destroy');
-    // Route::get('/rentals/export', [RentalController::class, 'export'])->name('rentals.export');
-    // Route::get('/rentals/export-pdf/{rental}', [RentalController::class, 'exportPdf'])->name('rentals.export-pdf');
     Route::get('/rentals/export-pdf-single/{rental}', [RentalController::class, 'exportPdfSingle'])->name('rentals.export-pdf-single');
     
     // Routes สำหรับตรวจสอบการเช่ารถซ้ำกัน
