@@ -286,6 +286,33 @@
             }
         }
 
+        // Function สำหรับจัดการการแสดง/ซ่อน input "อื่นๆ"
+        function toggleOtherInput(selectId, otherInputId) {
+            const select = document.getElementById(selectId);
+            const otherInput = document.getElementById(otherInputId);
+
+            // ล้าง error state
+            select.classList.remove('border-red-500');
+            select.classList.add('border-gray-300');
+
+            // ล้าง error message
+            const errorElement = otherInput.querySelector('.text-red-600');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+
+            if (select.value === 'อื่นๆ') {
+                otherInput.style.display = 'block';
+                otherInput.querySelector('input').required = true;
+            } else {
+                otherInput.style.display = 'none';
+                otherInput.querySelector('input').required = false;
+                otherInput.querySelector('input').value = '';
+                otherInput.querySelector('input').classList.remove('border-red-500');
+                otherInput.querySelector('input').classList.add('border-gray-300');
+            }
+        }
+
         // เพิ่ม Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             const nationalIdInput = document.getElementById('national_id');
@@ -294,6 +321,41 @@
 
             const startDateInput = document.getElementById('start_date');
             const endDateInput = document.getElementById('end_date');
+
+            // ตรวจสอบค่าเริ่มต้นสำหรับ input "อื่นๆ"
+            toggleOtherInput('start_location', 'start_location_other');
+            toggleOtherInput('end_location', 'end_location_other');
+
+            // จัดการ error state สำหรับ input "อื่นๆ" เมื่อมี validation error
+            if (document.querySelector('.text-red-600')) {
+                const startLocationSelect = document.getElementById('start_location');
+                const endLocationSelect = document.getElementById('end_location');
+
+                if (startLocationSelect.value === 'อื่นๆ') {
+                    document.getElementById('start_location_other').style.display = 'block';
+                }
+                if (endLocationSelect.value === 'อื่นๆ') {
+                    document.getElementById('end_location_other').style.display = 'block';
+                }
+            }
+
+            // เพิ่ม event listener สำหรับล้าง error state เมื่อพิมพ์ใน input "อื่นๆ"
+            const startLocationOtherInput = document.querySelector('#start_location_other input');
+            const endLocationOtherInput = document.querySelector('#end_location_other input');
+
+            if (startLocationOtherInput) {
+                startLocationOtherInput.addEventListener('input', function() {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-gray-300');
+                });
+            }
+
+            if (endLocationOtherInput) {
+                endLocationOtherInput.addEventListener('input', function() {
+                    this.classList.remove('border-red-500');
+                    this.classList.add('border-gray-300');
+                });
+            }
 
             // แสดง SweetAlert2 เมื่อมี session success
             const successMessage = document.getElementById('success-message');
@@ -407,6 +469,38 @@
                         isValid = false;
                         phoneInput.classList.add('border-red-500');
                         phoneInput.parentElement.querySelector('.text-red-600').style.display = 'block';
+                    }
+
+                    // ตรวจสอบสถานที่รับรถ
+                    const startLocationSelect = document.getElementById('start_location');
+                    const startLocationOther = document.getElementById('start_location_other');
+                    if (startLocationSelect.value === '') {
+                        isValid = false;
+                        startLocationSelect.classList.add('border-red-500');
+                    } else if (startLocationSelect.value === 'อื่นๆ') {
+                        const otherInput = startLocationOther.querySelector('input');
+                        if (!otherInput.value.trim()) {
+                            isValid = false;
+                            otherInput.classList.add('border-red-500');
+                            // แสดง input "อื่นๆ" เพื่อให้ผู้ใช้เห็น error
+                            startLocationOther.style.display = 'block';
+                        }
+                    }
+
+                    // ตรวจสอบสถานที่คืนรถ
+                    const endLocationSelect = document.getElementById('end_location');
+                    const endLocationOther = document.getElementById('end_location_other');
+                    if (endLocationSelect.value === '') {
+                        isValid = false;
+                        endLocationSelect.classList.add('border-red-500');
+                    } else if (endLocationSelect.value === 'อื่นๆ') {
+                        const otherInput = endLocationOther.querySelector('input');
+                        if (!otherInput.value.trim()) {
+                            isValid = false;
+                            otherInput.classList.add('border-red-500');
+                            // แสดง input "อื่นๆ" เพื่อให้ผู้ใช้เห็น error
+                            endLocationOther.style.display = 'block';
+                        }
                     }
 
                     if (!isValid) {
@@ -681,10 +775,34 @@
                         <div class="space-y-2">
                             <label for="start_location" class="block text-sm font-medium text-gray-700">สถานที่รับรถ
                                 *</label>
-                            <input id="start_location"
+                            <select id="start_location" name="start_location"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                type="text" name="start_location" value="{{ old('start_location') }}" required
-                                placeholder="เช่น สนามบิน ท่าเรือหน้าทอน  โรงแรม" />
+                                required onchange="toggleOtherInput('start_location', 'start_location_other')">
+                                <option value="">เลือกสถานที่รับรถ</option>
+                                <option value="สนามบิน" {{ old('start_location') == 'สนามบิน' ? 'selected' : '' }}>
+                                    สนามบิน</option>
+                                <option value="ท่าเรือซีทรานหน้าทอน"
+                                    {{ old('start_location') == 'ท่าเรือซีทรานหน้าทอน' ? 'selected' : '' }}>
+                                    ท่าเรือซีทรานหน้าทอน</option>
+                                <option value="ท่าเรือราชาเฟอรี่"
+                                    {{ old('start_location') == 'ท่าเรือราชาเฟอรี่' ? 'selected' : '' }}>
+                                    ท่าเรือราชาเฟอรี่</option>
+                                <option value="ท่าเรือหน้าพระลาน"
+                                    {{ old('start_location') == 'ท่าเรือหน้าพระลาน' ? 'selected' : '' }}>
+                                    ท่าเรือหน้าพระลาน</option>
+                                <option value="เซลทรัลสมุย"
+                                    {{ old('start_location') == 'เซลทรัลสมุย' ? 'selected' : '' }}>เซลทรัลสมุย</option>
+                                <option value="อื่นๆ" {{ old('start_location') == 'อื่นๆ' ? 'selected' : '' }}>อื่นๆ
+                                </option>
+                            </select>
+                            <div id="start_location_other" class="mt-2" style="display: none;">
+                                <input type="text" name="start_location_other"
+                                    class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                    placeholder="ระบุสถานที่รับรถ" value="{{ old('start_location_other') }}" />
+                                @error('start_location_other')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                             @error('start_location')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -693,10 +811,34 @@
                         <div class="space-y-2">
                             <label for="end_location" class="block text-sm font-medium text-gray-700">สถานที่คืนรถ
                                 *</label>
-                            <input id="end_location"
+                            <select id="end_location" name="end_location"
                                 class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                type="text" name="end_location" value="{{ old('end_location') }}" required
-                                placeholder="เช่น สนามบิน ท่าเรือหน้าทอน  โรงแรม" />
+                                required onchange="toggleOtherInput('end_location', 'end_location_other')">
+                                <option value="">เลือกสถานที่คืนรถ</option>
+                                <option value="สนามบิน" {{ old('end_location') == 'สนามบิน' ? 'selected' : '' }}>
+                                    สนามบิน</option>
+                                <option value="ท่าเรือซีทรานหน้าทอน"
+                                    {{ old('end_location') == 'ท่าเรือซีทรานหน้าทอน' ? 'selected' : '' }}>
+                                    ท่าเรือซีทรานหน้าทอน</option>
+                                <option value="ท่าเรือราชาเฟอรี่"
+                                    {{ old('end_location') == 'ท่าเรือราชาเฟอรี่' ? 'selected' : '' }}>
+                                    ท่าเรือราชาเฟอรี่</option>
+                                <option value="ท่าเรือหน้าพระลาน"
+                                    {{ old('end_location') == 'ท่าเรือหน้าพระลาน' ? 'selected' : '' }}>
+                                    ท่าเรือหน้าพระลาน</option>
+                                <option value="เซลทรัลสมุย"
+                                    {{ old('end_location') == 'เซลทรัลสมุย' ? 'selected' : '' }}>เซลทรัลสมุย</option>
+                                <option value="อื่นๆ" {{ old('end_location') == 'อื่นๆ' ? 'selected' : '' }}>อื่นๆ
+                                </option>
+                            </select>
+                            <div id="end_location_other" class="mt-2" style="display: none;">
+                                <input type="text" name="end_location_other"
+                                    class="block w-full px-4 py-3 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-500"
+                                    placeholder="ระบุสถานที่คืนรถ" value="{{ old('end_location_other') }}" />
+                                @error('end_location_other')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
                             @error('end_location')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror

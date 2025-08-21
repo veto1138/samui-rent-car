@@ -99,6 +99,8 @@ class RentalController extends Controller
                 'end_date' => 'required|date|after_or_equal:start_date',
                 'start_location' => 'required|string|max:150',
                 'end_location' => 'required|string|max:150',
+                'start_location_other' => 'nullable|string|max:150',
+                'end_location_other' => 'nullable|string|max:150',
                 'selfie_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 'national_id_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 'driver_license_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -110,6 +112,19 @@ class RentalController extends Controller
                 'phone.regex' => 'เบอร์โทรศัพท์ต้องขึ้นต้นด้วย 0 และมี 10 หลักเท่านั้น',
                 'phone.size' => 'เบอร์โทรศัพท์ต้องมี 10 หลักเท่านั้น',
             ]);
+
+            // Custom validation สำหรับสถานที่รับรถและคืนรถ
+            if ($request->start_location === 'อื่นๆ' && empty($request->start_location_other)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['start_location_other' => 'กรุณาระบุสถานที่รับรถ']);
+            }
+
+            if ($request->end_location === 'อื่นๆ' && empty($request->end_location_other)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['end_location_other' => 'กรุณาระบุสถานที่คืนรถ']);
+            }
 
             // ตรวจสอบการเช่ารถซ้ำกัน
             if ($request->car_id) {
@@ -139,6 +154,14 @@ class RentalController extends Controller
             $data = $request->all();
             // ใช้สถานะที่ส่งมาจากฟอร์ม (pending) หรือ default เป็น pending
             $data['status'] = $request->input('status', 'pending');
+
+            // จัดการสถานที่รับรถและคืนรถ
+            if ($request->start_location === 'อื่นๆ' && $request->start_location_other) {
+                $data['start_location'] = $request->start_location_other;
+            }
+            if ($request->end_location === 'อื่นๆ' && $request->end_location_other) {
+                $data['end_location'] = $request->end_location_other;
+            }
 
             // Handle file uploads
             if ($request->hasFile('selfie_image')) {
