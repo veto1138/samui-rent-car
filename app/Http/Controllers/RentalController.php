@@ -210,7 +210,7 @@ class RentalController extends Controller
                 'status' => 'required|in:pending,booked,using,success,cancel',
                 'car_id' => 'nullable|exists:cars,id',
                 'car_brand' => 'nullable|string|max:100',
-                'car_license_plate' => 'nullable|string|max:20',
+                'car_license_plate' => 'nullable|string|max:100',
                 'car_full_name' => 'nullable|string|max:100',
                 'rent_price' => 'nullable|numeric|min:0',
                 'insurance_price' => 'nullable|numeric|min:0',

@@ -66,12 +66,12 @@ class Rental extends Model
 
     public function getOwnerFullNameAttribute()
     {
-        return $this->owner_full_name;
+        return $this->attributes['owner_full_name'] ?? '';
     }
 
     public function getOwnerWitnessFullNameAttribute()
     {
-        return $this->owner_witness_full_name;
+        return $this->attributes['owner_witness_full_name'] ?? '';
     }
 
     public function getFormattedStartDateAttribute()

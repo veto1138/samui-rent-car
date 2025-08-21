@@ -377,24 +377,24 @@
 
                                 <!-- Owner Witness First Name -->
                                 <div>
-                                    <label for="owner_witness_firstname"
+                                    <label for="owner_witness_full_name"
                                         class="block text-sm font-medium text-gray-700 mb-2">
                                         ชื่อพยานเจ้าของรถ
                                     </label>
 
-                                    <select name="owner_witness_firstname" id="owner_witness_firstname" required
+                                    <select name="owner_witness_full_name" id="owner_witness_full_name" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
                                         <option value="">เลือกชื่อเจ้าของรถ</option>
                                         <option value="นางสาวเพียงโพยม ทองมั่น"
-                                            {{ old('owner_witness_firstname', $rental->owner_witness_firstname) == 'นางสาวเพียงโพยม ทองมั่น' ? 'selected' : '' }}>
+                                            {{ old('owner_witness_full_name', $rental->owner_witness_full_name) == 'นางสาวเพียงโพยม ทองมั่น' ? 'selected' : '' }}>
                                             นางสาวเพียงโพยม ทองมั่น
                                         </option>
                                         <option value="นางสาวเมธิกา ทองมีเพชร"
-                                            {{ old('owner_witness_firstname', $rental->owner_witness_firstname) == 'นางสาวเมธิกา ทองมีเพชร' ? 'selected' : '' }}>
+                                            {{ old('owner_witness_full_name', $rental->owner_witness_full_name) == 'นางสาวเมธิกา ทองมีเพชร' ? 'selected' : '' }}>
                                             นางสาวเมธิกา ทองมีเพชร
                                         </option>
                                     </select>
-                                    @error('owner_witness_firstname')
+                                    @error('owner_witness_full_name')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
 

@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('driver_license_image', 255)->nullable(); //รูปถ่ายใบขับขี่
             $table->unsignedBigInteger('car_id')->nullable(); //ID รถยนต์
             $table->string('car_brand', 100)->nullable(); //ยี่ห้อรถ
-            $table->string('car_license_plate', 20)->nullable(); //ทะเบียนรถ
+            $table->string('car_license_plate', 100)->nullable(); //ทะเบียนรถ
             $table->string('car_full_name', 100)->nullable(); //ชื่อรถยนต์
             $table->enum('status', ['pending', 'booked', 'using', 'success', 'cancel'])->default('pending'); //สถานะ
             $table->text('write_address',255)->nullable(); //เขียนที่
