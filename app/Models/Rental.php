@@ -27,6 +27,7 @@ class Rental extends Model
         'selfie_image',
         'national_id_image',
         'driver_license_image',
+        'car_id',
         'car_brand',
         'car_license_plate',
         'status',

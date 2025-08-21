@@ -83,7 +83,7 @@
                 <!-- Form Card -->
                 <div class="bg-white shadow-sm rounded-lg overflow-hidden">
                     <div class="px-6 py-4">
-                        <h2 class="text-lg font-semibold text-gray-900">ข้อมูลการเช่ารถ #{{ $rental->id }}</h2>
+                        <h2 class="text-lg font-semibold text-gray-900">ข้อมูลการเช่ารถ</h2>
                     </div>
 
                     <form method="POST" action="{{ route('rentals.update', $rental->id) }}" enctype="multipart/form-data"
@@ -214,6 +214,35 @@
                                                 {{ $car->full_name }} - {{ $car->license_plate }} ({{ $car->status }})
                                             </option>
                                         @endforeach
+
+                                        <!-- Debug info -->
+                                        <script>
+                                            console.log('Rental car_id: {{ $rental->car_id }}');
+                                            console.log('Available cars: {!! json_encode($cars->pluck('id', 'id')) !!}');
+                                            console.log('Rental car_brand: {{ $rental->car_id }}');
+                                            console.log('Rental car_license_plate: {{ $rental->car_license_plate }}');
+                                            console.log('Rental car_full_name: {{ $rental->car_full_name }}');
+
+                                            // Debug: ตรวจสอบการเปรียบเทียบ
+                                            @foreach ($cars as $car)
+                                                console.log(
+                                                    'Car {{ $car->id }}: {{ $car->id }} == {{ $rental->car_id }} = {{ $car->id == $rental->car_id }}'
+                                                );
+                                            @endforeach
+
+                                            // ตรวจสอบว่า option ไหนถูกเลือก
+                                            const carSelect = document.getElementById('car_id');
+                                            if (carSelect) {
+                                                console.log('Selected option value:', carSelect.value);
+                                                console.log('Selected option text:', carSelect.options[carSelect.selectedIndex]?.text);
+
+                                                // ตรวจสอบทุก option
+                                                for (let i = 0; i < carSelect.options.length; i++) {
+                                                    const option = carSelect.options[i];
+                                                    console.log(`Option ${i}: value="${option.value}", text="${option.text}", selected=${option.selected}`);
+                                                }
+                                            }
+                                        </script>
                                     </select>
                                     @error('car_id')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -589,6 +618,28 @@
             const startDateInput = document.getElementById('start_date');
             const endDateInput = document.getElementById('end_date');
 
+            // เรียก updateCarInfo เมื่อโหลดหน้าเพื่อแสดงข้อมูลรถที่เลือกไว้
+            // ใช้ setTimeout เพื่อให้แน่ใจว่า DOM โหลดเสร็จแล้ว
+            setTimeout(function() {
+                console.log('DOM loaded, calling updateCarInfo...');
+                updateCarInfo();
+
+                // ตรวจสอบว่าข้อมูลถูกอัปเดตหรือไม่
+                setTimeout(function() {
+                    const carBrand = document.getElementById('car_brand');
+                    const carLicense = document.getElementById('car_license_plate');
+                    const carFullName = document.getElementById('car_full_name');
+
+                    console.log('After updateCarInfo:');
+                    console.log('car_brand value:', carBrand ? carBrand.value :
+                        'element not found');
+                    console.log('car_license_plate value:', carLicense ? carLicense.value :
+                        'element not found');
+                    console.log('car_full_name value:', carFullName ? carFullName.value :
+                        'element not found');
+                }, 200);
+            }, 100);
+
             // ตั้งค่าเริ่มต้นจากค่าที่มีอยู่หรือเวลาปัจจุบัน
             function getCurrentDateTime() {
                 const now = new Date();
@@ -712,16 +763,31 @@
             const carSelect = document.getElementById('car_id');
             const selectedOption = carSelect.options[carSelect.selectedIndex];
 
-            if (selectedOption.value) {
+            console.log('updateCarInfo called');
+            console.log('carSelect:', carSelect);
+            console.log('selectedOption:', selectedOption);
+
+            if (selectedOption && selectedOption.value) {
                 // อัปเดตข้อมูลรถยนต์
-                document.getElementById('car_brand').value = selectedOption.getAttribute('data-brand');
-                document.getElementById('car_license_plate').value = selectedOption.getAttribute('data-license');
-                document.getElementById('car_full_name').value = selectedOption.getAttribute('data-full-name');
+                const brand = selectedOption.getAttribute('data-brand');
+                const license = selectedOption.getAttribute('data-license');
+                const fullName = selectedOption.getAttribute('data-full-name');
+
+                console.log('Car data:', {
+                    brand,
+                    license,
+                    fullName
+                });
+
+                document.getElementById('car_brand').value = brand || '';
+                document.getElementById('car_license_plate').value = license || '';
+                document.getElementById('car_full_name').value = fullName || '';
             } else {
                 // ล้างข้อมูลเมื่อไม่เลือกรถ
                 document.getElementById('car_brand').value = '';
                 document.getElementById('car_license_plate').value = '';
                 document.getElementById('car_full_name').value = '';
+                console.log('No car selected, clearing fields');
             }
         }
     </script>

@@ -20,7 +20,7 @@
 
 <body>
 
-    {{-- <nav
+    <nav
         class="bg-primary w-full h-16 fixed top-0 right-0 z-[999] border-b border-gray-200 flex grow items-center justify-end flex-row xl:px-6 transition-all duration-300">
 
         <div class="flex items-center justify-between w-full">
@@ -56,14 +56,8 @@
                 </form>
             </div>
         </div>
-    </nav> --}}
+    </nav>
 
-    {{-- <aside
-        class="fixed z-50 top-0 left-0 bottom-0 bg-white border-r border-gray-200 
-        transition-all duration-300 ease-in-out w-[290px] pt-16">
-
-       
-    </aside> --}}
 
     <div
         class="w-full h-full transition-all duration-300 ease-in-out absolute z-10 pt-[70px] overflow-hidden  overflow-y-auto ">

@@ -185,6 +185,11 @@ class RentalController extends Controller
     {
         $cars = \App\Models\Car::all();
         
+        // Debug: ตรวจสอบข้อมูลที่ส่งไปยัง view
+        \Log::info('Rental edit - rental car_id: ' . $rental->car_id);
+        \Log::info('Rental edit - cars count: ' . $cars->count());
+        \Log::info('Rental edit - cars IDs: ' . $cars->pluck('id')->implode(', '));
+        
         // ดึงรายการรถที่พร้อมใช้งานในช่วงเวลาที่เลือก
         $availableCars = [];
         if ($rental->start_date && $rental->end_date) {
