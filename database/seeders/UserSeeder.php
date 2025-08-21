@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     {
         // สร้าง admin user
         User::create([
-            'name' => 'Admin User',
+            'name' => 'Superadmin',
             'nickname' => 'Admin',
             'phone' => '081-234-5678',
             'email' => 'superadmin@gmail.com',

@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
 
         // เพิ่มข้อมูลการเช่ารถตัวอย่าง
         $this->call([
-            RentalSeeder::class,
             UserSeeder::class,
             CarSeeder::class,
         ]);

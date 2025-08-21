@@ -358,23 +358,19 @@
                                     <label for="owner_firstname" class="block text-sm font-medium text-gray-700 mb-2">
                                         ชื่อเจ้าของรถ
                                     </label>
-                                    <input type="text" name="owner_firstname" id="owner_firstname"
-                                        value="{{ old('owner_firstname', $rental->owner_firstname) }}"
+                                    <select name="owner_full_name" id="owner_full_name" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                                    @error('owner_firstname')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <!-- Owner Last Name -->
-                                <div>
-                                    <label for="owner_lastname" class="block text-sm font-medium text-gray-700 mb-2">
-                                        นามสกุลเจ้าของรถ
-                                    </label>
-                                    <input type="text" name="owner_lastname" id="owner_lastname"
-                                        value="{{ old('owner_lastname', $rental->owner_lastname) }}"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                                    @error('owner_lastname')
+                                        <option value="">เลือกชื่อเจ้าของรถ</option>
+                                        <option value="นายเทพทัต ทับทอง"
+                                            {{ old('owner_full_name', $rental->owner_full_name) == 'นายเทพทัต ทับทอง' ? 'selected' : '' }}>
+                                            นายเทพทัต ทับทอง
+                                        </option>
+                                        <option value="นายทรงยศ ทับทอง"
+                                            {{ old('owner_full_name', $rental->owner_full_name) == 'นายทรงยศ ทับทอง' ? 'selected' : '' }}>
+                                            นายทรงยศ ทับทอง
+                                        </option>
+                                    </select>
+                                    @error('owner_full_name')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
@@ -385,26 +381,23 @@
                                         class="block text-sm font-medium text-gray-700 mb-2">
                                         ชื่อพยานเจ้าของรถ
                                     </label>
-                                    <input type="text" name="owner_witness_firstname" id="owner_witness_firstname"
-                                        value="{{ old('owner_witness_firstname', $rental->owner_witness_firstname) }}"
+
+                                    <select name="owner_witness_firstname" id="owner_witness_firstname" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                                        <option value="">เลือกชื่อเจ้าของรถ</option>
+                                        <option value="นางสาวเพียงโพยม ทองมั่น"
+                                            {{ old('owner_witness_firstname', $rental->owner_witness_firstname) == 'นางสาวเพียงโพยม ทองมั่น' ? 'selected' : '' }}>
+                                            นางสาวเพียงโพยม ทองมั่น
+                                        </option>
+                                        <option value="นางสาวเมธิกา ทองมีเพชร"
+                                            {{ old('owner_witness_firstname', $rental->owner_witness_firstname) == 'นางสาวเมธิกา ทองมีเพชร' ? 'selected' : '' }}>
+                                            นางสาวเมธิกา ทองมีเพชร
+                                        </option>
+                                    </select>
                                     @error('owner_witness_firstname')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
-                                </div>
 
-                                <!-- Owner Witness Last Name -->
-                                <div>
-                                    <label for="owner_witness_lastname"
-                                        class="block text-sm font-medium text-gray-700 mb-2">
-                                        นามสกุลพยานเจ้าของรถ
-                                    </label>
-                                    <input type="text" name="owner_witness_lastname" id="owner_witness_lastname"
-                                        value="{{ old('owner_witness_lastname', $rental->owner_witness_lastname) }}"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
-                                    @error('owner_witness_lastname')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
                                 </div>
                             </div>
                         </div>

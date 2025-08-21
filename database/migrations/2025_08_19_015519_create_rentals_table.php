@@ -33,12 +33,12 @@ return new class extends Migration
             $table->string('car_brand', 100)->nullable(); //ยี่ห้อรถ
             $table->string('car_license_plate', 20)->nullable(); //ทะเบียนรถ
             $table->string('car_full_name', 100)->nullable(); //ชื่อรถยนต์
-            $table->enum('status', ['pending', 'using', 'success', 'cancel'])->default('pending'); //สถานะ
+            $table->enum('status', ['pending', 'booked', 'using', 'success', 'cancel'])->default('pending'); //สถานะ
             $table->text('write_address',255)->nullable(); //เขียนที่
-            $table->string('owner_firstname', 100)->nullable(); //ชื่อเจ้าของรถ
-            $table->string('owner_lastname', 100)->nullable(); //นามสกุลเจ้าของรถ
-            $table->string('owner_witness_firstname', 100)->nullable(); //ชื่อพยานเจ้าของรถ
-            $table->string('owner_witness_lastname', 100)->nullable(); //นามสกุลพยานเจ้าของรถ
+            $table->string('owner_full_name', 100)->nullable(); //ชื่อเจ้าของรถ
+            $table->string('owner_witness_full_name', 100)->nullable(); //ชื่อพยานเจ้าของรถ
+            $table->string('google_calendar_event_id')->nullable();
+            $table->timestamp('calendar_synced_at')->nullable();
             $table->timestamps();
         });
     }

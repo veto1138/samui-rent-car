@@ -31,10 +31,8 @@ class Rental extends Model
         'car_license_plate',
         'status',
         'write_address',
-        'owner_firstname',
-        'owner_lastname',
-        'owner_witness_firstname',
-        'owner_witness_lastname',
+        'owner_full_name',
+        'owner_witness_full_name',
         'google_calendar_event_id',
         'calendar_synced_at',
     ];
@@ -68,18 +66,12 @@ class Rental extends Model
 
     public function getOwnerFullNameAttribute()
     {
-        if ($this->owner_firstname && $this->owner_lastname) {
-            return $this->owner_firstname . ' ' . $this->owner_lastname;
-        }
-        return null;
+        return $this->owner_full_name;
     }
 
     public function getOwnerWitnessFullNameAttribute()
     {
-        if ($this->owner_witness_firstname && $this->owner_witness_lastname) {
-            return $this->owner_witness_firstname . ' ' . $this->owner_witness_lastname;
-        }
-        return null;
+        return $this->owner_witness_full_name;
     }
 
     public function getFormattedStartDateAttribute()
