@@ -465,8 +465,8 @@ class RentalController extends Controller
         $leftDotsPhone  = intdiv($dotsPhone, 2);
         $rightDotsPhone = $dotsPhone - $leftDotsPhone;
 
-        $carBrand = $rental->car_full_name ?? ''; // สมมติว่ามีชื่อใน $user->name
-        $totalLengthCarBrand = 30; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+        $carBrand = $rental->car_brand ?? ''; // สมมติว่ามีชื่อใน $user->name
+        $totalLengthCarBrand = 20; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
     
         $carBrandLength = mb_strlen($carBrand, 'UTF-8');
         $dotsCarBrand = $totalLengthCarBrand - $carBrandLength;
@@ -476,7 +476,7 @@ class RentalController extends Controller
         $rightDotsCarBrand = $dotsCarBrand - $leftDotsCarBrand;
 
         $carLicensePlate = $rental->car_license_plate ?? ''; // สมมติว่ามีชื่อใน $user->name
-        $totalLengthCarLicensePlate = 36; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
+        $totalLengthCarLicensePlate = 30; // ความยาวรวมของช่องชื่อ (จำนวนจุด+ชื่อ)
     
         $carLicensePlateLength = mb_strlen($carLicensePlate, 'UTF-8');
         $dotsCarLicensePlate = $totalLengthCarLicensePlate - $carLicensePlateLength;
@@ -553,6 +553,22 @@ class RentalController extends Controller
         $nationalIdImage = storage_path('app/public/' . str_replace('storage/', '', $rental->national_id_image));
         $driverLicenseImage = storage_path('app/public/' . str_replace('storage/', '', $rental->driver_license_image));
 
+
+        $ownerSignatureImage = null;
+        $ownerWitnessSignatureImage = null;
+
+        if($rental->owner_full_name == "นายเทพทัต ทับทอง") {
+            $ownerSignatureImage = public_path('signature/theptat.png');
+        }else if($rental->owner_full_name == "นายทรงยศ ทับทอง") {
+            $ownerSignatureImage = public_path('signature/songyos.png');
+        }
+
+        if($rental->owner_witness_full_name == "นางสาวเพียงโพยม ทองมั่น") {
+            $ownerWitnessSignatureImage = public_path('signature/poyom.png');
+        }else if($rental->owner_witness_full_name == "นางสาวเมธิกา ทองมีเพชร") {
+            $ownerWitnessSignatureImage = public_path('signature/metika.png');
+        }
+
         $data = [
             'rental' => $rental,
             'leftDotsName' => $leftDotsName,
@@ -583,9 +599,11 @@ class RentalController extends Controller
             'nationalIdImage' => $nationalIdImage,
             'driverLicenseImage' => $driverLicenseImage,
             'logoImage' => $logoImage,
+            'ownerSignatureImage' => $ownerSignatureImage,
+            'ownerWitnessSignatureImage' => $ownerWitnessSignatureImage,
         ];
         
-        $html = view('pdf.old', $data)->render();
+        $html = view('pdf.rental-report', $data)->render();
 
         $mpdf = new Mpdf([
             'fontDir' => array_merge($fontDirs, [storage_path('fonts')]),

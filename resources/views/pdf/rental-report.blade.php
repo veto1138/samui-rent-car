@@ -35,7 +35,7 @@
         }
 
         .signature {
-            margin-top: 40px;
+            margin-top: 20px;
         }
 
         table {
@@ -51,92 +51,101 @@
         .logo {
             width: 100px;
             height: 100px;
-            background-color: #000;
             position: absolute;
             top: 20px;
             left: 20px;
             z-index: 100;
         }
+
+        .sig-1 {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            bottom: 140px;
+            right: 190px;
+            z-index: 100;
+        }
+
+        .sig-2 {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            bottom: 60px;
+            right: 190px;
+            z-index: 100;
+        }
+
+        .sig-3 {
+            position: absolute;
+            bottom: 104px;
+            right: 160px;
+            z-index: 100;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 1000px;
+        }
     </style>
 </head>
 
 <body>
-    <h2 class="center m-0">หนังสือสัญญาเช่ารถยนต์</h2>
-    <p class="right m-0">เขียนที่ {{ $rental->write_address ?? '........................................' }}</p>
-    <p class="m-0">
-        ข้าพเจ้า
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->full_name ?? '' }}
-        </span>
-
-        เลขประจำตัวประชาชน
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->national_id ?? '' }}
-        </span>
-        <br>
-        ที่อยู่ปัจจุบัน เลขที่
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->address ?? '' }}
-        </span>
-        <br>
-        เบอร์โทรศัพท์
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->phone ?? '' }}
-        </span>
-        ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>“ผู้เช่า”</strong>
-        ได้ทำสัญญาเช่ารถของ {{ $rental->owner_full_name ?? 'นายเทพทัต ทับทอง' }}
-        ที่อยู่ {{ $rental->owner_address ?? 'เลขที่ 70 ม.2 ต.ท่าฉาง อ.ท่าฉาง จ.สุราษฎร์ธานี' }}
-        ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>เจ้าของกรรมสิทธิ์รถ/ผู้จัดการ <br />
+    <div class="logo">
+        <img src="{{ $logoImage }}" alt="Logo" style="width: 100px; height: 100px;">
+    </div>
+    <h3 class="center m-0">หนังสือสัญญาเช่ารถยนต์</h3>
+    <p class="right">เขียนที่ {{ $rental->write_address ?? '........................................' }}</p>
+    <p class="m-0" style="">
+        ข้าพเจ้า{{ str_repeat('.', $leftDotsName) }} {{ $rental->full_name }} {{ str_repeat('.', $rightDotsName) }}
+        เลขประจำตัวประชาชน{{ str_repeat('.', $leftDotsNationalId) }} {{ $rental->national_id }}
+        {{ str_repeat('.', $rightDotsNationalId) }}
+    </p>
+    <p class="m-0" style="">
+        ที่อยู่ปัจจุบัน เลขที่{{ str_repeat('.', $leftDotsAddress) }} {{ $rental->address }}
+        {{ str_repeat('.', $rightDotsAddress) }}
+    </p>
+    <p class="m-0" style="">
+        เบอร์โทรศัพท์{{ str_repeat('.', $leftDotsPhone) }} {{ $rental->phone }}
+        {{ str_repeat('.', $rightDotsPhone) }}
+        ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>“ผู้เช่า”</strong> ได้ทำสัญญาเช่ารถของ
+    </p>
+    <p class="m-0" style="">
+        นายเทพทัต ทับทอง ที่อยู่ เลขที่ 70 ม.2 ตำบล ท่าฉาง อ.ท่าฉาง จ.สุราษฎร์ธานี<br />
+        ซึ่งต่อไปในสัญญานี้เรียกว่า <strong>เจ้าของกรรมสิทธิ์รถ/ผู้จัดการ
             ทั้งสองฝ่ายได้ตกลงทำสัญญาดังมีข้อความต่อไปนี้</strong>
     </p>
-
-    <p style="text-indent: 70px; margin: 0px">
-        <strong>ข้อ 1.</strong> ผู้เช่าได้เช่ารถยนต์ยี่ห้อ
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->car_brand ?? '' }}
-        </span>
+    <p class="m-0" style="text-indent: 70px;margin-top: 16px;">
+        <strong>ข้อ 1.</strong> ผู้เช่าได้เช่ารถยนต์ยี่ห้อ {{ str_repeat('.', $leftDotsCarBrand) }}
+        {{ $rental->car_brand }}
+        {{ str_repeat('.', $rightDotsCarBrand) }}
         เลขทะเบียน
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->car_license_plate ?? '' }}
-        </span>
-        ของผู้ให้เช่าหนึ่งคัน ราคา
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ number_format($rental->rent_price, 0) ?? '' }}
-        </span>
-        บาท<br /> (<span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->rent_price_text ?? '' }}
-        </span>)
-        <br />
-        ตั้งแต่ วันที่ เวลา สถานที่ <strong>รับรถ</strong>
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->thai_start_date ?? '' }} ที่ {{ $rental->start_location ?? '' }}
-        </span><br />
-        ถึง วันที่ เวลา สถานที่ <strong>คืนรถ</strong>
-        <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->thai_end_date ?? '' }} {{ $rental->end_time ?? '' }} น.
-            ที่ {{ $rental->end_location ?? '' }}
-        </span>
+        {{ str_repeat('.', $leftDotsCarLicensePlate) }} {{ $rental->car_license_plate }}
+        {{ str_repeat('.', $rightDotsCarLicensePlate) }}
     </p>
-    <p style="text-indent: 70px; margin: 0px">
-        <strong>ข้อ 2.</strong> ผู้เช่าได้นำเงิน <span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ number_format($rental->insurance_price, 0) ?? '' }}
-        </span>
-        บาท
-        (<span
-            style="border-bottom: 1px dotted #000; display: inline-block; min-width: 120px; text-align: center;padding: 0 10px; margin: 0 20px">
-            {{ $rental->insurance_price_text ?? '' }}
-        </span>)
+    <p class="m-0">
+        ของผู้ให้เช่าหนึ่งคัน ราคา {{ str_repeat('.', $leftDotsRentPrice) }} {{ $rental->rent_price }}
+        {{ str_repeat('.', $rightDotsRentPrice) }} บาท (<span>{{ str_repeat('.', $leftDotsRentPriceText) }}
+            {{ $rental->rent_price_text ?? '' }}
+            {{ str_repeat('.', $rightDotsRentPriceText) }}</span>)
+    </p>
+    <p class="m-0">
+        ตั้งแต่ วันที่ เวลา สถานที่ <strong>รับรถ</strong>
+        {{ str_repeat('.', $leftDotsStartDate) }} {{ $rental->thai_start_date ?? '' }} ที่
+        {{ $rental->start_location ?? '' }}
+        {{ str_repeat('.', $rightDotsStartDate) }}
+    </p>
+    <p class="m-0">
+        ถึง วันที่ เวลา สถานที่ <strong>คืนรถ</strong>
+        {{ str_repeat('.', $leftDotsEndDate) }} {{ $rental->thai_end_date ?? '' }} {{ $rental->end_time ?? '' }} น.
+        ที่ {{ $rental->end_location ?? '' }}
+        {{ str_repeat('.', $rightDotsEndDate) }}
+    </p>
+    <p class="m-0" style="text-indent: 70px;">
+        <strong>ข้อ 2.</strong> ผู้เช่านำเงิน {{ str_repeat('.', $leftDotsInsurancePrice) }}
+        {{ $rental->insurance_price }}
+        {{ str_repeat('.', $rightDotsInsurancePrice) }} บาท
+        (<span>{{ str_repeat('.', $leftDotsInsurancePriceText) }} {{ $rental->insurance_price_text ?? '' }}
+            {{ str_repeat('.', $rightDotsInsurancePriceText) }}</span>)
         มามอบให้ผู้เช่าถือไว้เป็นประกัน
     </p>
     <p style="text-indent: 70px; margin: 0px">
@@ -190,17 +199,72 @@
         เมื่อผู้ให้เช่าได้รับรถและเครื่องอุปกรณ์ตรวจถูกต้องไม่มีการชำรุดเสียหายอย่างใดแล้ว ต้องคืน
         ทรัพย์ที่วางประกันให้ผู้เช่าไป
     </p>
-    <div class="signature">
-        <table>
+    @if ($rental->owner_full_name == 'นายทรงยศ ทับทอง')
+        <div class="sig-1">
+            <img src="{{ $ownerSignatureImage }}" alt="Logo" style="width: 70px; height: 70px;">
+        </div>
+    @endif
+    @if ($rental->owner_full_name == 'นายเทพทัต ทับทอง')
+        <div class="sig-1">
+            <img src="{{ $ownerSignatureImage }}" alt="Logo" style="width: 70px; height: 70px;">
+        </div>
+    @endif
+
+    @if ($rental->owner_witness_full_name == 'นางสาวเพียงโพยม ทองมั่น')
+        <div class="sig-3">
+            <img src="{{ $ownerWitnessSignatureImage }}" alt="Logo" style="width: 170px; height: auto;">
+        </div>
+    @endif
+    @if ($rental->owner_witness_full_name == 'นางสาวเมธิกา ทองมีเพชร')
+        <div class="sig-2">
+            <img src="{{ $ownerWitnessSignatureImage }}" alt="Logo" style="width: 70px; height: auto;">
+        </div>
+    @endif
+    <div class="signature" style="position: relative;">
+        <div style="width: 340px; height: 100px;  float: left; position: relative; text-align: center;">
+            <p style="margin: 0px 0px;"> ลงชื่อ ..................................................................
+                ผู้เช่า<br>
+                ( {{ $rental->full_name ?? '' }} )</p>
+            <p style="margin: 16px 0px;"> ลงชื่อ
+                .....................................................พยานฝั่งผู้เช่า<br>
+                ( {{ $rental->witness_firstname . ' ' . $rental->witness_lastname ?? '' }} )</p>
+        </div>
+        <div style="width: 340px; height: 100px;  position: relative; text-align: center;">
+            @if ($rental->owner_full_name == 'นายทรงยศ ทับทอง')
+                {{-- <div style="width: 60px; height: 60px; background-color: red; margin-left: 100px;margin-top: 50px">
+
+                </div> --}}
+                {{-- <img src="{{ $ownerSignatureImage }}" alt="Owner Signature Image"
+                    style="width: 60px; height: auto; position: absolute; top: 120px; left: 0; margin-top: 30px;"> --}}
+            @endif
+            <p style="margin: 0px 0px;"> ลงชื่อ
+                .................................................ผู้ให้เช่า/ผู้จัดการ<br>
+                ( {{ $rental->owner_full_name ?? '' }} )</p>
+            <p style="margin: 16px 0px;"> ลงชื่อ .................................................พยานฝั่งผู้ให้เช่า<br>
+                ( {{ $rental->owner_witness_full_name ?? '' }} )</p>
+        </div>
+
+        {{-- <table>
             <tr>
                 <td class="center">
-                    ลงชื่อ ................................................. ผู้ให้เช่า<br>
+                    ลงชื่อ ................................................. ผู้เช่า<br>
                     ( {{ $rental->full_name ?? '' }} )
                 </td>
                 <td class="center">
-                    ลงชื่อ ................................................. ผู้ให้เช่า/ผู้จัดการ<br>
+                    @if ($rental->owner_full_name == 'นายเทพทัต ทับทอง')
+                        <img src="{{ $ownerSignatureImage }}" alt="Owner Signature Image"
+                            style="width: 100px; height: auto; position: absolute; top: 0; left: 0;">
+                    @endif
+                    <div style="width: 100%; height: 100; position: relative; background-color: red;">
+                        @if ($rental->owner_full_name == 'นายทรงยศ ทับทอง')
+                            <img src="{{ $ownerSignatureImage }}" alt="Owner Signature Image"
+                                style="width: 100px; height: auto;">
+                        @endif
 
-                    ( {{ $rental->owner_firstname . ' ' . $rental->owner_lastname ?? '' }} )
+                        ลงชื่อ ................................................. ผู้ให้เช่า/ผู้จัดการ<br>
+
+                        ( {{ $rental->owner_full_name ?? '' }} )
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -210,10 +274,10 @@
                 </td>
                 <td class="center">
                     ลงชื่อ ................................................. พยานฝั่งผู้ให้เช่า<br>
-                    ( {{ $rental->owner_witness_firstname . ' ' . $rental->owner_witness_lastname ?? '' }} )
+                    ( {{ $rental->owner_witness_full_name ?? '' }} )
                 </td>
             </tr>
-        </table>
+        </table> --}}
     </div>
 
     <h3 class="center">นิยามคำศัพท์ในสัญญาเช่ารถ</h3>
@@ -280,6 +344,24 @@
         เกิดขึ้นตามความสมัครใจ โดยไม่มีการบังคับ ในที่นี้อาจเป็นบิดา มารดา สามี ภรรยา พี่น้อง ญาติ
         หรือเพื่อนของผู้ให้เช่า
     </p>
+    </p>
+
+    <div class="image-container">
+
+        <img src="{{ $selfieImage }}" alt="Selfie Image" style="width: 100%; height: auto;">
+
+    </div>
+    <div class="image-container">
+
+        <img src="{{ $nationalIdImage }}" alt="National ID Image" style="width: 100%; height: auto;">
+
+    </div>
+
+    <div class="image-container">
+
+        <img src="{{ $driverLicenseImage }}" alt="Driver License Image" style="width: 100%; height: auto;">
+
+    </div>
 </body>
 
 </html>

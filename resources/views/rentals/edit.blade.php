@@ -384,7 +384,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Owner First Name -->
                                 <div>
-                                    <label for="owner_firstname" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label for="owner_full_name" class="block text-sm font-medium text-gray-700 mb-2">
                                         ชื่อเจ้าของรถ
                                     </label>
                                     <select name="owner_full_name" id="owner_full_name" required
